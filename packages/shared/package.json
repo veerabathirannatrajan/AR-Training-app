@@ -1,0 +1,13 @@
+{
+  "name": "@ar-training/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared types, content schemas and scoring types for the AR Mining Training App",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}
