@@ -1,0 +1,168 @@
+{
+  "id": "ar-basics",
+  "version": 1,
+  "kind": "tutorial",
+  "title": {
+    "en": "AR Basics",
+    "hi": "AR की बुनियादी बातें"
+  },
+  "summary": {
+    "en": "Learn to place, turn and use the AR training area before the safety modules.",
+    "hi": "सुरक्षा मॉड्यूल से पहले AR प्रशिक्षण क्षेत्र को रखना, घुमाना और इस्तेमाल करना सीखें।"
+  },
+  "briefing": {
+    "en": "Welcome. In this short practice you will learn the moves used in every training module: placing the training area, turning it, tapping, dragging, aiming, pressing and holding, and crouching. There is no test. Take your time.",
+    "hi": "स्वागत है। इस छोटे अभ्यास में आप वे तरीके सीखेंगे जो हर प्रशिक्षण मॉड्यूल में काम आते हैं: प्रशिक्षण क्षेत्र रखना, उसे घुमाना, टैप करना, खींचना, निशाना लगाना, दबाए रखना और झुकना। इसमें कोई परीक्षा नहीं है। आराम से करें।"
+  },
+  "objectives": [
+    {
+      "en": "Place and turn the AR training area",
+      "hi": "AR प्रशिक्षण क्षेत्र रखना और घुमाना"
+    },
+    {
+      "en": "Tap and drag objects",
+      "hi": "चीज़ों पर टैप करना और उन्हें खींचना"
+    },
+    {
+      "en": "Aim with the crosshair and press and hold",
+      "hi": "निशाना लगाना और बटन दबाए रखना"
+    },
+    {
+      "en": "Crouch low, as you would under smoke",
+      "hi": "धुएँ के नीचे रहने की तरह झुकना"
+    }
+  ],
+  "estimatedMinutes": 3,
+  "steps": [
+    {
+      "id": "place",
+      "interaction": "place",
+      "points": 10,
+      "instruction": {
+        "en": "Point your phone at the floor and move it slowly. When the ring appears, tap the screen to place the training area.",
+        "hi": "फ़ोन को ज़मीन की ओर करें और धीरे-धीरे घुमाएँ। घेरा दिखने पर स्क्रीन पर टैप करके प्रशिक्षण क्षेत्र रखें।"
+      },
+      "fallbackInstruction": {
+        "en": "In 3D mode the training area is placed for you.",
+        "hi": "3D मोड में प्रशिक्षण क्षेत्र अपने-आप रख दिया जाता है।"
+      },
+      "success": {
+        "en": "Training area placed.",
+        "hi": "प्रशिक्षण क्षेत्र रख दिया गया।"
+      },
+      "hint": {
+        "en": "Aim at a clear, well-lit patch of floor. Plain shiny floors are harder for the camera to see.",
+        "hi": "ज़मीन के किसी खाली और अच्छी रोशनी वाले हिस्से की ओर करें। एकदम सादी चमकदार ज़मीन कैमरे को मुश्किल से दिखती है।"
+      }
+    },
+    {
+      "id": "rotate",
+      "interaction": "rotate",
+      "points": 10,
+      "instruction": {
+        "en": "Drag your finger left or right across the screen to turn the training area.",
+        "hi": "प्रशिक्षण क्षेत्र घुमाने के लिए स्क्रीन पर उँगली बाएँ या दाएँ खींचें।"
+      },
+      "fallbackInstruction": {
+        "en": "Drag your finger across the screen to look around the training area.",
+        "hi": "प्रशिक्षण क्षेत्र को चारों ओर से देखने के लिए स्क्रीन पर उँगली खींचें।"
+      },
+      "success": {
+        "en": "Good. You can turn the area whenever you need a better view.",
+        "hi": "बढ़िया। बेहतर देखने के लिए आप कभी भी क्षेत्र घुमा सकते हैं।"
+      }
+    },
+    {
+      "id": "tap-cone",
+      "interaction": "tap",
+      "points": 15,
+      "instruction": {
+        "en": "Tap the orange safety cone.",
+        "hi": "नारंगी सेफ़्टी कोन पर टैप करें।"
+      },
+      "success": {
+        "en": "Correct, that is the safety cone.",
+        "hi": "सही, यही सेफ़्टी कोन है।"
+      },
+      "hint": {
+        "en": "Look for the pointed orange cone with white stripes.",
+        "hi": "सफ़ेद धारियों वाला नुकीला नारंगी कोन ढूँढें।"
+      }
+    },
+    {
+      "id": "drag-helmet",
+      "interaction": "drag-drop",
+      "points": 15,
+      "instruction": {
+        "en": "Press on the yellow helmet, drag it to the helmet stand and let go.",
+        "hi": "पीले हेलमेट को दबाकर हेलमेट स्टैंड तक खींचें और छोड़ दें।"
+      },
+      "success": {
+        "en": "Helmet placed on the stand.",
+        "hi": "हेलमेट स्टैंड पर रख दिया गया।"
+      },
+      "hint": {
+        "en": "Let go of the helmet right over the stand with the round plate.",
+        "hi": "हेलमेट को गोल प्लेट वाले स्टैंड के ठीक ऊपर छोड़ें।"
+      }
+    },
+    {
+      "id": "aim-target",
+      "interaction": "aim",
+      "points": 15,
+      "instruction": {
+        "en": "Move your phone so the crosshair in the middle of the screen is on the red target. Hold it steady.",
+        "hi": "फ़ोन घुमाकर स्क्रीन के बीच वाले निशान को लाल टारगेट पर रखें और स्थिर रखें।"
+      },
+      "fallbackInstruction": {
+        "en": "Drag the screen, or turn on Gyro and tilt your phone, so the crosshair is on the red target. Hold it steady.",
+        "hi": "स्क्रीन खींचकर, या जाइरो चालू करके फ़ोन झुकाकर, बीच वाले निशान को लाल टारगेट पर रखें और स्थिर रखें।"
+      },
+      "success": {
+        "en": "On target.",
+        "hi": "निशाना सही लगा।"
+      }
+    },
+    {
+      "id": "hold-target",
+      "interaction": "hold",
+      "points": 15,
+      "instruction": {
+        "en": "Keep the crosshair on the target and press and hold the Hold button until the bar is full.",
+        "hi": "निशान को टारगेट पर रखते हुए 'दबाए रखें' बटन को तब तक दबाए रखें जब तक पट्टी भर न जाए।"
+      },
+      "success": {
+        "en": "Well done. Later you will use press and hold to squeeze a fire extinguisher handle.",
+        "hi": "बहुत अच्छे। आगे आप अग्निशामक यंत्र का हैंडल दबाने के लिए इसी तरह बटन दबाए रखेंगे।"
+      },
+      "hint": {
+        "en": "The bar only fills while the crosshair is on the target.",
+        "hi": "पट्टी तभी भरती है जब निशान टारगेट पर हो।"
+      }
+    },
+    {
+      "id": "crouch",
+      "interaction": "crouch",
+      "points": 20,
+      "instruction": {
+        "en": "Stand up straight for a moment. Then crouch down low, as you would to stay under smoke, and stay low until the bar is full.",
+        "hi": "एक पल सीधे खड़े रहें। फिर धुएँ के नीचे रहने की तरह नीचे झुक जाएँ और पट्टी भरने तक नीचे ही रहें।"
+      },
+      "fallbackInstruction": {
+        "en": "Press and hold the Crouch button until the bar is full. In AR mode you crouch for real.",
+        "hi": "पट्टी भरने तक 'झुकें' बटन दबाए रखें। AR मोड में आपको सच में झुकना होता है।"
+      },
+      "success": {
+        "en": "Good. Staying low keeps you under the smoke, where the air is cleaner.",
+        "hi": "बढ़िया। नीचे रहने से आप धुएँ के नीचे रहते हैं, जहाँ हवा ज़्यादा साफ़ होती है।"
+      },
+      "notes": "'Get low and go under the smoke' is standard fire-escape guidance (e.g. NFPA, American Red Cross). The Fire module assesses it; this step only teaches the gesture."
+    }
+  ],
+  "review": {
+    "source": "App interaction tutorial. No safety procedure is taught except the 'stay low under smoke' cue in step 'crouch' (standard fire-escape guidance, e.g. NFPA / American Red Cross).",
+    "notes": "Hindi is written at a plain reading level and should be checked by a Hindi-speaking trainer. Santali is not translated yet and falls back to Hindi.",
+    "reviewedBy": null,
+    "reviewedAt": null
+  }
+}

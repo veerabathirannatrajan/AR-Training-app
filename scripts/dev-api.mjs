@@ -8,9 +8,22 @@ if (!venvExists()) {
   process.exit(1);
 }
 
+// --timeout-graceful-shutdown: without it a reload on Windows can hang forever waiting for the
+// phone's keep-alive connections, leaving the old code serving.
 const child = spawn(
   VENV_PYTHON,
-  ['-m', 'uvicorn', 'app.main:app', '--reload', '--host', '127.0.0.1', '--port', '8000'],
+  [
+    '-m',
+    'uvicorn',
+    'app.main:app',
+    '--reload',
+    '--timeout-graceful-shutdown',
+    '2',
+    '--host',
+    '127.0.0.1',
+    '--port',
+    '8000',
+  ],
   { cwd: API_DIR, stdio: 'inherit' },
 );
 

@@ -3,7 +3,16 @@
  * They feed the assessment engine, per-step mastery and the admin dashboard.
  */
 export type TrainingAction =
-  'tap' | 'drag-drop' | 'hold' | 'aim' | 'swipe' | 'crouch' | 'move' | 'select-option';
+  | 'place'
+  | 'rotate'
+  | 'tap'
+  | 'drag-drop'
+  | 'hold'
+  | 'aim'
+  | 'swipe'
+  | 'crouch'
+  | 'move'
+  | 'select-option';
 
 export interface TrainingEvent {
   /** Client-generated UUID so events can be de-duplicated on sync. */
