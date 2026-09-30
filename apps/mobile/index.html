@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#11151c" />
+    <meta name="description" content="AR safety training for mining, steel and mica workers" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <title>AR Mining Training</title>
+  </head>
+  <body>
+    <!-- 3D canvas (fallback and AR rendering) -->
+    <div id="root"></div>
+    <!-- All UI panels. Also the WebXR dom-overlay root, so the same UI floats over the camera in AR. -->
+    <div id="xr-overlay"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
