@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "types": ["vite/client", "webxr"]
+    "types": ["vite/client", "webxr", "vite-plugin-pwa/react", "vite-plugin-pwa/client"]
   },
   "include": ["src"]
 }

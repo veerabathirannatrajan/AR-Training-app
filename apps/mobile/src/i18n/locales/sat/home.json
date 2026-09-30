@@ -1,0 +1,12 @@
+{
+  "greeting": {
+    "text": "ᱡᱚᱦᱟᱨ, {{name}}",
+    "needsReview": true,
+    "source": "machine-draft"
+  },
+  "start": {
+    "text": "ᱮᱛᱦᱚᱵ",
+    "needsReview": true,
+    "source": "machine-draft"
+  }
+}

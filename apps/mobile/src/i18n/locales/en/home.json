@@ -1,0 +1,24 @@
+{
+  "greeting": "Hello, {{name}}",
+  "workerMeta": "{{role}} · {{site}}",
+  "modulesTitle": "Your training",
+  "kind": {
+    "tutorial": "Practice",
+    "assessed": "Assessed"
+  },
+  "status": {
+    "notStarted": "Not started",
+    "inProgress": "Started",
+    "completed": "Completed"
+  },
+  "bestScore": "Best score {{score}}%",
+  "attempts_one": "{{count}} attempt",
+  "attempts_other": "{{count}} attempts",
+  "practiceOnly": "Practice only, no certificate",
+  "start": "Start",
+  "again": "Practice again",
+  "menu": {
+    "open": "Open menu",
+    "title": "Menu"
+  }
+}

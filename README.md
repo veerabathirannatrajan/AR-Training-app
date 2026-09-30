@@ -3,18 +3,22 @@
 AR safety training for Jharkhand's mining, steel and mica workers (SIH 2026, PS SIH26041).
 See [PROJECT_BRIEF.md](PROJECT_BRIEF.md) for the full scope and phase plan.
 
-> Status: **Phase 0**. Monorepo, tooling, phone dev loop and the "Hello AR" device test.
+> Status: **Phase 1**. AR engine core, design system, language select, worker login,
+> home, offline shell (installable app), and the AR Basics practice module.
 > The full setup and demo guide comes in Phase 7.
 
 ## Layout
 
-| Path              | What                                                                   |
-| ----------------- | ---------------------------------------------------------------------- |
-| `apps/mobile`     | Worker app: React 18 + TS + Vite, React Three Fiber, `@react-three/xr` |
-| `apps/admin`      | Admin compliance portal (Phase 5)                                      |
-| `services/api`    | FastAPI service (Python, `.venv` inside)                               |
-| `packages/shared` | Shared TypeScript types, content schemas, scoring types                |
-| `scripts`         | Dev helpers: phone/adb setup, API venv setup and runner                |
+| Path                      | What                                                                     |
+| ------------------------- | ------------------------------------------------------------------------ |
+| `apps/mobile`             | Worker app: React 18 + TS + Vite, React Three Fiber, `@react-three/xr`   |
+| `apps/mobile/src/engine`  | AR engine: placement, input, aiming, crouch tracking, 3D fallback, HUD   |
+| `apps/mobile/src/modules` | Module scenes (3D content + step logic), one folder per module           |
+| `apps/admin`              | Admin compliance portal (Phase 5)                                        |
+| `services/api`            | FastAPI service (Python, `.venv` inside)                                 |
+| `packages/shared`         | Shared TypeScript types, content schemas, scoring types                  |
+| `packages/shared/content` | Module content JSON (reviewable; every module has `review.source/notes`) |
+| `scripts`                 | Dev helpers: phone/adb, API venv and runner, translation export          |
 
 ## Prerequisites
 
@@ -31,7 +35,11 @@ npm install
 npm run setup:api
 ```
 
-## Daily dev loop (phone over USB)
+The API creates `services/api/dev.db` and seeds demo data on first start: 4 sites
+(Dhanbad, Bokaro, Ranchi, Koderma) and 48 workers. **Demo login: any worker ID from
+`11001`–`11012`, `12001`–`12012`, `13001`–`13012`, `14001`–`14012`, PIN `1234`.**
+
+## Daily dev loop (phone over USB, hot reload)
 
 Run each in its own terminal:
 
@@ -45,21 +53,56 @@ npm run phone      # adb reverse 5173 + 8000, then opens http://localhost:5173 i
 context (WebXR requires one) and keeps hot reload working. Re-run `npm run phone` after
 reconnecting the cable.
 
-**Phone console logs:** open `chrome://inspect/#devices` in Chrome on the laptop and click
-**inspect** under `localhost:5173`.
+- **Phone console logs:** open `chrome://inspect/#devices` in Chrome on the laptop and click
+  **inspect** under `localhost:5173`.
+- **Force the 3D fallback** on an AR-capable phone: open `http://localhost:5173/?mode=3d`.
+- **Performance / debug:** add `?debug` to log fps, draw calls and triangles every 2 s.
 
-**Force the 3D fallback** on an AR-capable phone: open `http://localhost:5173/?mode=3d`.
+## Install it on the phone as its own app
+
+The dev server has no service worker (so hot reload never serves stale files). To get the
+installable, offline-capable app:
+
+```sh
+npm run dev:api     # the first login on a phone needs the API
+npm run app         # production build, served on http://127.0.0.1:4173
+npm run phone:app   # adb reverse 4173 + 8000 and open it in Chrome on the phone
+```
+
+On the phone: Chrome menu (⋮) → **Install app** (or the **Install app** button on the
+language screen / home menu). It gets its own home-screen icon and opens full screen without
+the browser bar. After the first login it works without the laptop and without internet:
+the app shell, fonts, content and narration are all precached, and workers who have logged in
+on that phone can log in again offline with their PIN.
+
+A signed APK (Trusted Web Activity via Bubblewrap) comes in Phase 7; it needs the app hosted
+on an HTTPS domain.
+
+## Languages
+
+English, हिन्दी and ᱥᱟᱱᱛᱟᱲᱤ (Santali, Ol Chiki). Fonts are bundled for all three scripts.
+
+- Santali strings are never invented. The few machine-drafted ones are marked
+  `needsReview: true` (tests enforce this); everything else falls back to Hindi until a
+  native speaker translates it. The app shows a notice while Santali is selected.
+- `npm run i18n:export` writes every UI and module string (en / hi / sat + review flags and
+  safety notes) to `translations/strings.csv` for translators.
+- Recorded narration can replace text-to-speech: see `apps/mobile/src/assets/audio/README.md`.
 
 ## Scripts
 
-| Script                  | Does                                             |
-| ----------------------- | ------------------------------------------------ |
-| `npm run dev`           | Mobile dev server                                |
-| `npm run dev:api`       | FastAPI with auto-reload                         |
-| `npm run setup:api`     | Create `services/api/.venv` and install deps     |
-| `npm run phone`         | Check adb/device, reverse ports, open Chrome     |
-| `npm run phone:reverse` | Same, without opening Chrome                     |
-| `npm run typecheck`     | Strict TypeScript across workspaces              |
-| `npm run lint`          | ESLint                                           |
-| `npm run format`        | Prettier                                         |
-| `npm run build`         | Typecheck and production build of all workspaces |
+| Script                  | Does                                               |
+| ----------------------- | -------------------------------------------------- |
+| `npm run dev`           | Mobile dev server (hot reload, no service worker)  |
+| `npm run dev:api`       | FastAPI with auto-reload                           |
+| `npm run setup:api`     | Create `services/api/.venv` and install deps       |
+| `npm run phone`         | Check adb/device, reverse ports, open the dev app  |
+| `npm run phone:reverse` | Same, without opening Chrome                       |
+| `npm run app`           | Build and serve the installable app on :4173       |
+| `npm run phone:app`     | Point the phone at the installable app             |
+| `npm run i18n:export`   | Export all strings to `translations/strings.csv`   |
+| `npm test`              | Unit tests (mobile, shared) and API tests (pytest) |
+| `npm run typecheck`     | Strict TypeScript across workspaces                |
+| `npm run lint`          | ESLint                                             |
+| `npm run format`        | Prettier                                           |
+| `npm run build`         | Typecheck and production build of all workspaces   |

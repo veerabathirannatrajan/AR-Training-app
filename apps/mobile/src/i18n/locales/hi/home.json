@@ -1,0 +1,24 @@
+{
+  "greeting": "जोहार, {{name}}",
+  "workerMeta": "{{role}} · {{site}}",
+  "modulesTitle": "आपका प्रशिक्षण",
+  "kind": {
+    "tutorial": "अभ्यास",
+    "assessed": "मूल्यांकन"
+  },
+  "status": {
+    "notStarted": "शुरू नहीं हुआ",
+    "inProgress": "शुरू किया",
+    "completed": "पूरा हुआ"
+  },
+  "bestScore": "सबसे अच्छा स्कोर {{score}}%",
+  "attempts_one": "{{count}} प्रयास",
+  "attempts_other": "{{count}} प्रयास",
+  "practiceOnly": "केवल अभ्यास, प्रमाणपत्र नहीं",
+  "start": "शुरू करें",
+  "again": "फिर से अभ्यास करें",
+  "menu": {
+    "open": "मेन्यू खोलें",
+    "title": "मेन्यू"
+  }
+}

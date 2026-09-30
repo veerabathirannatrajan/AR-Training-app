@@ -4,3 +4,4 @@ dev-dist
 package-lock.json
 services/api/.venv
 PROJECT_BRIEF.md
+services/api/.pytest_cache

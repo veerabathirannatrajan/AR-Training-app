@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "npm run typecheck && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.node.json"
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.node.json",
+    "test": "vitest run",
+    "icons": "pwa-assets-generator"
   },
   "dependencies": {
     "@ar-training/shared": "*",
@@ -20,6 +22,7 @@
     "dexie": "^4.4.6",
     "dexie-react-hooks": "^4.4.0",
     "i18next": "^26.4.2",
+    "lucide-react": "^1.49.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^17.0.15",

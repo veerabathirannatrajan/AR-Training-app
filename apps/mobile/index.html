@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-IN">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -8,13 +8,16 @@
     />
     <meta name="theme-color" content="#11151c" />
     <meta name="description" content="AR safety training for mining, steel and mica workers" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
     <title>AR Mining Training</title>
   </head>
   <body>
-    <!-- 3D canvas (fallback and AR rendering) -->
+    <!-- 3D canvas (training scenes in AR and 3D mode) -->
     <div id="root"></div>
-    <!-- All UI panels. Also the WebXR dom-overlay root, so the same UI floats over the camera in AR. -->
+    <!-- All UI. Also the WebXR dom-overlay root, so the same UI floats over the camera in AR. -->
     <div id="xr-overlay"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

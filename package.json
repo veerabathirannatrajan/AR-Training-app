@@ -24,7 +24,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "npm run test --workspaces --if-present && npm run test:api",
-    "test:api": "node scripts/test-api.mjs"
+    "test:api": "node scripts/test-api.mjs",
+    "app": "npm run build -w @ar-training/mobile && npm run preview -w @ar-training/mobile",
+    "phone:app": "node scripts/phone.mjs --open --app",
+    "i18n:export": "node scripts/i18n-export.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

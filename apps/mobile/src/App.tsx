@@ -1,108 +1,84 @@
-import type { XRCapabilities, XRUnsupportedReason } from '@ar-training/shared';
 import { Canvas } from '@react-three/fiber';
 import { XR } from '@react-three/xr';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { HelloARScene } from './features/hello-ar/HelloARScene';
-import { HelloFallbackScene } from './features/hello-ar/HelloFallbackScene';
-import { HelloPreviewScene } from './features/hello-ar/HelloPreviewScene';
-import { ARHud, FallbackHud } from './features/hello-ar/Hud';
-import { UNSUPPORTED_REASON_TEXT } from './features/hello-ar/messages';
-import { StartScreen } from './features/hello-ar/StartScreen';
+import { installBackGuard, useCurrentRoute, type Route } from './app/navigation';
+import { TrainingWorld } from './engine/TrainingWorld';
+import { useRunnerStore } from './engine/runner/runnerStore';
+import { useBlockXRSelectOnUI } from './engine/xr/xrUi';
+import { useXRSession } from './engine/xr/useXRSession';
+import { xrStore } from './engine/xr/xrStore';
 import { overlayRoot } from './lib/overlayRoot';
-import { useApiHealth } from './lib/useApiHealth';
-import { describeARStartError, detectXRCapabilities, isFallbackForced } from './xr/capabilities';
-import { useBlockXRSelectOnUI } from './xr/useBlockXRSelectOnUI';
-import { useXRSession } from './xr/useXRSession';
-import { xrStore } from './xr/xrStore';
+import { findModule } from './modules/registry';
+import { DeviceCheckScreen } from './screens/DeviceCheckScreen';
+import { HomeScreen } from './screens/HomeScreen';
+import { LanguageScreen } from './screens/LanguageScreen';
+import { LoginScreen } from './screens/LoginScreen';
+import { ModuleIntroScreen } from './screens/ModuleIntroScreen';
+import { SplashScreen } from './screens/SplashScreen';
+import { TrainingScreen } from './screens/TrainingScreen';
 
-/** Why the 3D fallback is showing; `null` means the user chose it on an AR-capable phone. */
-type FallbackState = { reason: XRUnsupportedReason | null } | null;
+function Screen({ route }: { route: Route }) {
+  switch (route.name) {
+    case 'splash':
+      return <SplashScreen />;
+    case 'language':
+      return <LanguageScreen next={route.next} />;
+    case 'login':
+      return <LoginScreen />;
+    case 'home':
+      return <HomeScreen />;
+    case 'module-intro':
+      return <ModuleIntroScreen moduleId={route.moduleId} />;
+    case 'device-check':
+      return <DeviceCheckScreen moduleId={route.moduleId} />;
+    case 'training':
+      return <TrainingScreen moduleId={route.moduleId} mode={route.mode} />;
+  }
+}
+
+/**
+ * One canvas for the whole app, always mounted, so an AR session can be started straight
+ * from a button tap. It only renders while a training module is open.
+ */
+function Stage({ route }: { route: Route }) {
+  const sessionId = useRunnerStore((state) => state.sessionId);
+  const training = route.name === 'training' ? route : null;
+  const definition = training != null ? findModule(training.moduleId) : undefined;
+
+  return (
+    <Canvas
+      frameloop={training != null ? 'always' : 'never'}
+      dpr={[1, 1.5]}
+      flat
+      gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+      camera={{ fov: 60, near: 0.01, far: 60, position: [0, 1.6, 2.4] }}
+    >
+      <XR store={xrStore}>
+        {training != null && definition != null && sessionId != null && (
+          <TrainingWorld key={`${training.mode}:${sessionId}`} mode={training.mode}>
+            <definition.Scene />
+          </TrainingWorld>
+        )}
+      </XR>
+    </Canvas>
+  );
+}
 
 export function App() {
-  const session = useXRSession();
-  const api = useApiHealth();
-  const [capabilities, setCapabilities] = useState<XRCapabilities | null>(null);
-  const [fallback, setFallback] = useState<FallbackState>(null);
-  const [arError, setArError] = useState<string | null>(null);
-  const [startingAR, setStartingAR] = useState(false);
+  const route = useCurrentRoute();
+  const xrSession = useXRSession();
 
   useBlockXRSelectOnUI(overlayRoot);
-
+  useEffect(() => installBackGuard(), []);
   useEffect(() => {
-    let cancelled = false;
-    void detectXRCapabilities().then((detected) => {
-      if (cancelled) return;
-      console.info('[xr] capabilities', detected);
-      setCapabilities(detected);
-      // No AR on this device (or forced for testing): go straight to the 3D fallback.
-      if (isFallbackForced()) {
-        setFallback({ reason: 'forced-fallback' });
-      } else if (!detected.immersiveAr) {
-        setFallback({ reason: detected.unsupportedReason });
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const startAR = useCallback(async () => {
-    setArError(null);
-    setStartingAR(true);
-    try {
-      await xrStore.enterAR();
-    } catch (error) {
-      console.error('[xr] enterAR failed', error);
-      setArError(describeARStartError(error));
-    } finally {
-      setStartingAR(false);
-    }
-  }, []);
-
-  const exitAR = useCallback(() => {
-    void xrStore.getState().session?.end();
-  }, []);
-
-  const stage = session != null ? 'ar' : fallback != null ? 'fallback3d' : 'start';
+    overlayRoot.classList.toggle('in-ar', xrSession != null);
+  }, [xrSession]);
 
   return (
     <>
-      <Canvas
-        dpr={[1, 1.5]}
-        flat
-        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-        camera={{ fov: 60, near: 0.01, far: 50, position: [0, 1.6, 2.4] }}
-      >
-        <XR store={xrStore}>
-          {stage === 'ar' && <HelloARScene />}
-          {stage === 'fallback3d' && <HelloFallbackScene />}
-          {stage === 'start' && <HelloPreviewScene />}
-        </XR>
-      </Canvas>
-
-      {createPortal(
-        <>
-          {stage === 'ar' && <ARHud onExit={exitAR} />}
-          {stage === 'fallback3d' && (
-            <FallbackHud
-              reason={fallback?.reason != null ? UNSUPPORTED_REASON_TEXT[fallback.reason] : null}
-              onExit={() => setFallback(null)}
-            />
-          )}
-          {stage === 'start' && (
-            <StartScreen
-              capabilities={capabilities}
-              api={api}
-              arError={arError}
-              startingAR={startingAR}
-              onStartAR={() => void startAR()}
-              onStart3D={() => setFallback({ reason: null })}
-            />
-          )}
-        </>,
-        overlayRoot,
-      )}
+      <Stage route={route} />
+      {createPortal(<Screen route={route} />, overlayRoot)}
     </>
   );
 }

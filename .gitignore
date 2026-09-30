@@ -32,3 +32,5 @@ desktop.ini
 *.pem
 *.key
 services/api/keys/
+.pytest_cache/
+translations/

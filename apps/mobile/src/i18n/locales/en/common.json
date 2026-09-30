@@ -1,0 +1,39 @@
+{
+  "appName": "AR Mining Training",
+  "tagline": "Safety training for mining, steel and mica workers",
+  "actions": {
+    "continue": "Continue",
+    "back": "Back",
+    "cancel": "Cancel",
+    "retry": "Try again",
+    "close": "Close",
+    "start": "Start",
+    "next": "Next",
+    "listen": "Listen",
+    "installApp": "Install app",
+    "update": "Update",
+    "logout": "Log out"
+  },
+  "status": {
+    "online": "Online",
+    "offline": "Offline",
+    "offlineReady": "Works offline"
+  },
+  "language": {
+    "label": "Language",
+    "change": "Change language",
+    "draft": "Draft",
+    "santaliDraftNotice": "Santali text is a draft waiting for review by a native speaker. Anything not yet translated is shown in Hindi."
+  },
+  "voice": {
+    "replay": "Play instructions again",
+    "on": "Voice on",
+    "off": "Voice off"
+  },
+  "pwa": {
+    "updateReady": "A new version is ready",
+    "installHint": "Install the app to open it from your home screen and use it without internet."
+  },
+  "minutes_one": "{{count}} min",
+  "minutes_other": "{{count}} min"
+}

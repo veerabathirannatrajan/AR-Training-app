@@ -1,0 +1,81 @@
+{
+  "intro": {
+    "objectives": "You will learn",
+    "duration": "About {{count}} min",
+    "start": "Start"
+  },
+  "deviceCheck": {
+    "title": "Getting ready",
+    "checking": "Checking your phone…",
+    "arReady": "AR is ready on this phone.",
+    "arUnavailable": "AR is not available on this phone. You will train in 3D mode. The steps and scoring are the same.",
+    "space": "Clear about 2 × 2 metres of floor and make sure the area is well lit. Stay aware of real hazards around you.",
+    "startAr": "Start in AR",
+    "use3d": "Use 3D mode",
+    "starting": "Starting AR…",
+    "reasons": {
+      "insecure-context": "This page is not opened securely, so AR is blocked.",
+      "no-webxr": "This browser does not support AR. Use Chrome on Android.",
+      "no-immersive-ar": "This phone does not support web AR (it needs Google Play Services for AR).",
+      "check-failed": "The AR check failed on this phone.",
+      "forced-fallback": "3D mode was forced for testing."
+    },
+    "errors": {
+      "camera-denied": "Camera access was denied. Allow the camera for this app in Chrome settings, then try again.",
+      "not-supported": "This phone could not start AR with floor tracking. Use 3D mode instead.",
+      "unknown": "AR could not start. Use 3D mode, or try again."
+    }
+  },
+  "placement": {
+    "searching": "Move your phone slowly and point it at the floor",
+    "ready": "Tap the screen to place the training area",
+    "reposition": "Move area"
+  },
+  "topBar": {
+    "step": "Step {{current}}/{{total}}",
+    "points": "{{score}} pts",
+    "elapsed": "Time",
+    "exit": "Leave training"
+  },
+  "controls": {
+    "hold": "Hold",
+    "crouch": "Crouch",
+    "gyro": "Gyro",
+    "gyroUnavailable": "No gyroscope on this phone"
+  },
+  "crouch": {
+    "standUp": "Stand up straight",
+    "goLow": "Crouch lower",
+    "stayLow": "Good, stay low"
+  },
+  "exit": {
+    "title": "Leave this training?",
+    "body": "This attempt will not be counted.",
+    "leave": "Leave",
+    "stay": "Keep training"
+  },
+  "arStopped": {
+    "title": "AR stopped",
+    "body": "The camera view was closed. Continue in AR, or switch to 3D mode.",
+    "resume": "Resume AR",
+    "switch3d": "Continue in 3D"
+  },
+  "result": {
+    "tutorialDone": "Practice complete",
+    "score": "Score",
+    "time": "Time",
+    "steps": "Steps",
+    "mistakes_one": "{{count}} mistake",
+    "mistakes_other": "{{count}} mistakes",
+    "home": "Back to home",
+    "again": "Practice again"
+  },
+  "objects": {
+    "cone": "safety cone",
+    "crate": "crate",
+    "barrel": "barrel"
+  },
+  "feedback": {
+    "wrongObject": "That is the {{name}}."
+  }
+}
