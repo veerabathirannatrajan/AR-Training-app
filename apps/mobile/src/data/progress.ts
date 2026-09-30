@@ -1,8 +1,12 @@
-import type { ModuleResult, TrainingSession } from '@ar-training/shared';
+import { resultPercent, type ModuleResult, type TrainingSession } from '@ar-training/shared';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from './db';
 
-export type ModuleStatus = 'not-started' | 'in-progress' | 'completed';
+/**
+ * - tutorials: not-started → in-progress → completed
+ * - assessed modules: not-started → in-progress → failed / passed (a pass is never undone)
+ */
+export type ModuleStatus = 'not-started' | 'in-progress' | 'completed' | 'passed' | 'failed';
 
 export interface ModuleProgress {
   status: ModuleStatus;
@@ -40,9 +44,12 @@ export function summarizeProgress(
   }
   for (const result of results) {
     const progress = entry(result.moduleId);
-    progress.status = 'completed';
-    const percent = result.maxScore > 0 ? Math.round((result.score / result.maxScore) * 100) : 0;
-    progress.bestPercent = Math.max(progress.bestPercent ?? 0, percent);
+    if (result.attemptType === 'retraining') continue;
+    if (result.passed === true) progress.status = 'passed';
+    else if (result.passed === false) {
+      if (progress.status !== 'passed') progress.status = 'failed';
+    } else progress.status = 'completed';
+    progress.bestPercent = Math.max(progress.bestPercent ?? 0, resultPercent(result));
     progress.lastCompletedAt = Math.max(progress.lastCompletedAt ?? 0, result.completedAt);
   }
   return byModule;

@@ -1,0 +1,767 @@
+{
+  "id": "fire-explosion",
+  "version": 1,
+  "kind": "assessed",
+  "title": {
+    "en": "Fire & Explosion Response",
+    "hi": "आग और विस्फोट से बचाव"
+  },
+  "summary": {
+    "en": "An electrical fire breaks out at a workstation. Raise the alarm, put it out safely with the right extinguisher, then escape under the smoke.",
+    "hi": "एक वर्कस्टेशन पर बिजली से आग लग जाती है। अलार्म बजाएँ, सही अग्निशामक से सुरक्षित तरीके से आग बुझाएँ, फिर धुएँ के नीचे रहते हुए बाहर निकलें।"
+  },
+  "briefing": {
+    "en": "An electrical fire starts at a workstation. Raise the alarm, identify the fire, choose the correct extinguisher and use it with the PASS technique. Then smoke fills the room and an exit is blocked: stay low and find a safe way out to the assembly point. Actions that could cost lives, such as water on an electrical fire, fail the assessment. A short quiz follows.",
+    "hi": "एक वर्कस्टेशन पर बिजली से आग लगती है। अलार्म बजाएँ, आग की पहचान करें, सही अग्निशामक चुनें और PASS तरीके से उसका इस्तेमाल करें। फिर कमरे में धुआँ भर जाता है और एक निकास बंद हो जाता है: झुके रहें और असेंबली पॉइंट तक सुरक्षित रास्ता ढूँढें। जान जोखिम में डालने वाली गलतियाँ, जैसे बिजली की आग पर पानी डालना, आपको फ़ेल कर देंगी। अंत में एक छोटी प्रश्नोत्तरी है।"
+  },
+  "objectives": [
+    {
+      "en": "Raise the alarm before anything else",
+      "hi": "सबसे पहले अलार्म बजाना"
+    },
+    {
+      "en": "Choose a safe extinguisher for an electrical fire",
+      "hi": "बिजली की आग के लिए सुरक्षित अग्निशामक चुनना"
+    },
+    {
+      "en": "Use an extinguisher with the PASS technique",
+      "hi": "PASS तरीके से अग्निशामक चलाना"
+    },
+    {
+      "en": "Stay low under smoke and escape by a safe route",
+      "hi": "धुएँ के नीचे झुककर सुरक्षित रास्ते से बाहर निकलना"
+    }
+  ],
+  "estimatedMinutes": 6,
+  "criticalErrors": [
+    {
+      "id": "water-on-electrical",
+      "title": {
+        "en": "Water used on an electrical fire",
+        "hi": "बिजली की आग पर पानी डाला"
+      },
+      "explanation": {
+        "en": "Water conducts electricity. Spraying it on live electrical equipment can give you a fatal electric shock and spread the fire. Use a CO₂ extinguisher (or dry powder), and switch off the power only if you can reach the switch safely.",
+        "hi": "पानी में बिजली का करंट दौड़ता है। चालू बिजली के उपकरण पर पानी डालने से आपको जानलेवा करंट लग सकता है और आग फैल सकती है। CO₂ अग्निशामक (या ड्राई पाउडर) इस्तेमाल करें, और बिजली तभी बंद करें जब स्विच तक सुरक्षित पहुँच सकें।"
+      },
+      "notes": "Water and water-based extinguishers are unsuitable for energised electrical equipment (IS 2190:2010 selection guidance; NFPA 10)."
+    },
+    {
+      "id": "blocked-route",
+      "title": {
+        "en": "Tried to escape through a blocked exit",
+        "hi": "बंद निकास से भागने की कोशिश की"
+      },
+      "explanation": {
+        "en": "An exit blocked by fire or smoke is a trap. Turn back and use the nearest other exit that is clear.",
+        "hi": "आग या धुएँ से बंद निकास एक जाल है। वापस मुड़ें और सबसे पास का दूसरा खुला निकास इस्तेमाल करें।"
+      }
+    },
+    {
+      "id": "used-lift",
+      "title": {
+        "en": "Used the lift during a fire",
+        "hi": "आग के समय लिफ़्ट का इस्तेमाल किया"
+      },
+      "explanation": {
+        "en": "A lift can stop between floors, open onto the fire or fill with smoke. During a fire always use the stairs and marked exits.",
+        "hi": "लिफ़्ट मंज़िलों के बीच रुक सकती है, आग वाली मंज़िल पर खुल सकती है या उसमें धुआँ भर सकता है। आग के समय हमेशा सीढ़ियों और चिह्नित निकासों का इस्तेमाल करें।"
+      },
+      "notes": "National Building Code of India 2016 Part 4 and NFPA guidance: lifts are not used for evacuation unless designated as fire/evacuation lifts under fire-service control."
+    },
+    {
+      "id": "re-entry",
+      "title": {
+        "en": "Went back into the building",
+        "hi": "वापस इमारत के अंदर गए"
+      },
+      "explanation": {
+        "en": "Never go back inside until the fire service says it is safe. Tell the fire warden about anyone or anything left inside.",
+        "hi": "जब तक फ़ायर सर्विस सुरक्षित न कहे, कभी वापस अंदर न जाएँ। अंदर छूटे किसी व्यक्ति या सामान के बारे में फ़ायर वार्डन को बताएँ।"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "id": "raise-alarm",
+      "title": {
+        "en": "Raise the alarm",
+        "hi": "अलार्म बजाना"
+      },
+      "interaction": "tap",
+      "points": 10,
+      "timeLimitSeconds": 20,
+      "group": "alarm",
+      "tone": "danger",
+      "headline": {
+        "en": "Fire at the workstation!",
+        "hi": "वर्कस्टेशन पर आग!"
+      },
+      "instruction": {
+        "en": "Raise the alarm first: tap the red fire alarm call point on its stand.",
+        "hi": "सबसे पहले अलार्म बजाएँ: स्टैंड पर लगे लाल फ़ायर अलार्म कॉल पॉइंट पर टैप करें।"
+      },
+      "success": {
+        "en": "Alarm raised. Everyone is warned and help is on the way.",
+        "hi": "अलार्म बज गया। सबको चेतावनी मिल गई है और मदद आ रही है।"
+      },
+      "hint": {
+        "en": "Warn everyone before you do anything else. Find the red call point box and tap it.",
+        "hi": "कुछ भी करने से पहले सबको सावधान करें। लाल कॉल पॉइंट बॉक्स ढूँढें और उस पर टैप करें।"
+      },
+      "notes": "Raising the alarm first is standard fire-response practice (e.g. the RACE sequence; NBC 2016 Part 4 fire drill procedures). Touching an extinguisher before the alarm counts as a mistake."
+    },
+    {
+      "id": "identify-fire",
+      "title": {
+        "en": "Identify the fire",
+        "hi": "आग की पहचान करना"
+      },
+      "interaction": "select-option",
+      "points": 10,
+      "timeLimitSeconds": 30,
+      "group": "identify",
+      "tone": "danger",
+      "headline": {
+        "en": "What is burning?",
+        "hi": "क्या जल रहा है?"
+      },
+      "instruction": {
+        "en": "Look at the fire. What kind of fire is it?",
+        "hi": "आग को देखें। यह किस तरह की आग है?"
+      },
+      "success": {
+        "en": "Correct: an electrical fire. If it is safe, switch off the power. Never use water on it.",
+        "hi": "सही: यह बिजली की आग है। अगर सुरक्षित हो, तो बिजली बंद करें। इस पर कभी पानी न डालें।"
+      },
+      "hint": {
+        "en": "Look closely: sparks are coming from the computer and the power strip. The fire is in live electrical equipment.",
+        "hi": "ध्यान से देखें: कंप्यूटर और पावर स्ट्रिप से चिंगारियाँ निकल रही हैं। आग चालू बिजली के उपकरण में लगी है।"
+      },
+      "options": [
+        {
+          "id": "ordinary",
+          "label": {
+            "en": "Wood, paper or cloth",
+            "hi": "लकड़ी, कागज़ या कपड़ा"
+          },
+          "outcome": "wrong"
+        },
+        {
+          "id": "liquid",
+          "label": {
+            "en": "Oil, petrol or diesel",
+            "hi": "तेल, पेट्रोल या डीज़ल"
+          },
+          "outcome": "wrong"
+        },
+        {
+          "id": "electrical",
+          "label": {
+            "en": "Live electrical equipment",
+            "hi": "चालू बिजली के उपकरण"
+          },
+          "outcome": "correct"
+        },
+        {
+          "id": "metal",
+          "label": {
+            "en": "Burning metal",
+            "hi": "जलती हुई धातु"
+          },
+          "outcome": "wrong"
+        }
+      ],
+      "notes": "PROJECT_BRIEF asks for 'electrical, Class C in Indian classification context'. Under IS 2190:2010 / IS 15683, Class C is flammable gases and electrical fires are not a separate class (NFPA 10 uses Class C for energised electrical equipment). The app says 'electrical fire' without a class letter until a safety expert confirms which label to show."
+    },
+    {
+      "id": "choose-extinguisher",
+      "title": {
+        "en": "Choose the extinguisher",
+        "hi": "अग्निशामक चुनना"
+      },
+      "interaction": "select-option",
+      "points": 20,
+      "timeLimitSeconds": 45,
+      "group": "extinguisher",
+      "tone": "danger",
+      "headline": {
+        "en": "Electrical fire detected",
+        "hi": "बिजली की आग"
+      },
+      "instruction": {
+        "en": "Select the correct extinguisher in the tray, then tap it in the scene to pick it up.",
+        "hi": "नीचे की ट्रे में सही अग्निशामक चुनें, फिर उठाने के लिए दृश्य में उस पर टैप करें।"
+      },
+      "warning": {
+        "en": "Do not use water on electrical fires",
+        "hi": "बिजली की आग पर पानी का इस्तेमाल न करें"
+      },
+      "success": {
+        "en": "CO₂ is the right choice: it does not conduct electricity and leaves no residue.",
+        "hi": "CO₂ सही चुनाव है: इससे करंट नहीं दौड़ता और कोई अवशेष नहीं बचता।"
+      },
+      "hint": {
+        "en": "Water and foam can conduct electricity. Choose CO₂ (black band) or dry powder (blue band).",
+        "hi": "पानी और फ़ोम से करंट दौड़ सकता है। CO₂ (काली पट्टी) या ड्राई पाउडर (नीली पट्टी) चुनें।"
+      },
+      "options": [
+        {
+          "id": "water",
+          "label": {
+            "en": "Water",
+            "hi": "पानी"
+          },
+          "outcome": "critical",
+          "criticalErrorId": "water-on-electrical"
+        },
+        {
+          "id": "foam",
+          "label": {
+            "en": "Foam",
+            "hi": "फ़ोम"
+          },
+          "outcome": "wrong",
+          "feedback": {
+            "en": "Foam contains water and can conduct electricity. It is not for live electrical fires.",
+            "hi": "फ़ोम में पानी होता है और इससे करंट दौड़ सकता है। यह चालू बिजली की आग के लिए नहीं है।"
+          }
+        },
+        {
+          "id": "co2",
+          "label": {
+            "en": "CO₂",
+            "hi": "CO₂"
+          },
+          "outcome": "correct"
+        },
+        {
+          "id": "powder",
+          "label": {
+            "en": "Dry powder",
+            "hi": "ड्राई पाउडर"
+          },
+          "outcome": "acceptable",
+          "points": 15,
+          "feedback": {
+            "en": "Dry powder is safe on electrical fires, but it damages equipment and makes it hard to see. CO₂ is preferred.",
+            "hi": "ड्राई पाउडर बिजली की आग पर सुरक्षित है, पर यह उपकरणों को खराब करता है और दिखना मुश्किल कर देता है। CO₂ बेहतर है।"
+          }
+        }
+      ],
+      "notes": "CO₂ preferred and dry powder (ABC / DCP) acceptable on energised electrical equipment; water and foam unsuitable. Refs: IS 2190:2010, NFPA 10. Colour bands follow the common EN 3 / BS 7863 convention also seen on Indian labels (water: red, foam: cream, CO₂: black, powder: blue); expert to confirm local labelling."
+    },
+    {
+      "id": "pass-pull",
+      "title": {
+        "en": "Pull the pin",
+        "hi": "पिन खींचना"
+      },
+      "interaction": "tap",
+      "points": 10,
+      "timeLimitSeconds": 20,
+      "group": "pass",
+      "badge": "P",
+      "headline": {
+        "en": "PASS: Pull",
+        "hi": "PASS: पिन खींचें"
+      },
+      "instruction": {
+        "en": "Keep about 2 metres from the fire with your exit behind you. Tap the safety pin on the extinguisher to pull it out.",
+        "hi": "आग से लगभग 2 मीटर दूर रहें और बाहर निकलने का रास्ता आपके पीछे हो। पिन निकालने के लिए अग्निशामक की सेफ़्टी पिन पर टैप करें।"
+      },
+      "success": {
+        "en": "Pin pulled. The extinguisher is ready.",
+        "hi": "पिन निकल गई। अग्निशामक तैयार है।"
+      },
+      "hint": {
+        "en": "Tap the silver ring at the top of the extinguisher.",
+        "hi": "अग्निशामक के ऊपर लगी चाँदी जैसी रिंग पर टैप करें।"
+      },
+      "notes": "PASS (Pull, Aim, Squeeze, Sweep) per NFPA / OSHA portable extinguisher guidance. About 2 m is a typical working distance for portable CO₂ units; the label on the actual unit takes precedence."
+    },
+    {
+      "id": "pass-aim",
+      "title": {
+        "en": "Aim at the base",
+        "hi": "आग की जड़ पर निशाना लगाना"
+      },
+      "interaction": "aim",
+      "points": 10,
+      "group": "pass",
+      "badge": "A",
+      "headline": {
+        "en": "PASS: Aim",
+        "hi": "PASS: निशाना लगाएँ"
+      },
+      "instruction": {
+        "en": "Aim at the base of the fire, where the fuel is burning, not at the flames. Move your phone until the crosshair is on the base and hold it there.",
+        "hi": "आग की जड़ पर निशाना लगाएँ, जहाँ चीज़ जल रही है, लपटों पर नहीं। फ़ोन घुमाकर निशान को आग की जड़ पर लाएँ और वहीं रोके रखें।"
+      },
+      "fallbackInstruction": {
+        "en": "Drag the screen, or turn on Gyro, until the crosshair is on the base of the fire, not the flames. Hold it there.",
+        "hi": "स्क्रीन खींचकर, या जाइरो चालू करके, निशान को आग की जड़ पर लाएँ, लपटों पर नहीं। वहीं रोके रखें।"
+      },
+      "success": {
+        "en": "Good aim: at the base of the fire.",
+        "hi": "अच्छा निशाना: आग की जड़ पर।"
+      },
+      "hint": {
+        "en": "Aim lower. Spraying at the top of the flames does not put the fire out.",
+        "hi": "थोड़ा नीचे निशाना लगाएँ। लपटों के ऊपर छिड़कने से आग नहीं बुझती।"
+      }
+    },
+    {
+      "id": "pass-squeeze",
+      "title": {
+        "en": "Squeeze the handle",
+        "hi": "हैंडल दबाना"
+      },
+      "interaction": "hold",
+      "points": 10,
+      "group": "pass",
+      "badge": "S",
+      "headline": {
+        "en": "PASS: Squeeze",
+        "hi": "PASS: हैंडल दबाएँ"
+      },
+      "instruction": {
+        "en": "Keep aiming at the base and press and hold Squeeze to discharge the extinguisher.",
+        "hi": "आग की जड़ पर निशाना बनाए रखें और अग्निशामक चलाने के लिए 'दबाएँ' बटन दबाए रखें।"
+      },
+      "success": {
+        "en": "Discharging. Keep the handle squeezed.",
+        "hi": "अग्निशामक चल रहा है। हैंडल दबाए रखें।"
+      },
+      "hint": {
+        "en": "It only discharges while you hold Squeeze with the crosshair on the base of the fire.",
+        "hi": "यह तभी चलता है जब आप 'दबाएँ' दबाए रखें और निशान आग की जड़ पर हो।"
+      }
+    },
+    {
+      "id": "pass-sweep",
+      "title": {
+        "en": "Sweep side to side",
+        "hi": "दाएँ-बाएँ घुमाना"
+      },
+      "interaction": "swipe",
+      "points": 20,
+      "group": "pass",
+      "badge": "S",
+      "headline": {
+        "en": "PASS: Sweep",
+        "hi": "PASS: दाएँ-बाएँ घुमाएँ"
+      },
+      "instruction": {
+        "en": "Keep squeezing and sweep from side to side across the base of the fire until it is out: move your phone left and right, swipe the screen, or slide your thumb on Squeeze.",
+        "hi": "दबाए रखते हुए आग की जड़ पर दाएँ-बाएँ घुमाएँ, जब तक आग बुझ न जाए: फ़ोन को बाएँ-दाएँ करें, स्क्रीन पर उँगली फिराएँ, या 'दबाएँ' पर अँगूठा बाएँ-दाएँ सरकाएँ।"
+      },
+      "fallbackInstruction": {
+        "en": "Keep holding Squeeze and slide your thumb left and right on it (or drag the view) to sweep across the base of the fire until it is out.",
+        "hi": "'दबाएँ' को दबाए रखें और उस पर अँगूठा बाएँ-दाएँ सरकाएँ (या दृश्य को खींचें), ताकि आग की जड़ पर दाएँ-बाएँ छिड़काव हो, जब तक आग बुझ न जाए।"
+      },
+      "success": {
+        "en": "The fire is out. Keep watching it: it can flare up again.",
+        "hi": "आग बुझ गई। उस पर नज़र रखें: यह फिर से भड़क सकती है।"
+      },
+      "hint": {
+        "en": "Keep the crosshair on the base while you sweep, and do not let go of Squeeze.",
+        "hi": "घुमाते समय निशान आग की जड़ पर रखें और 'दबाएँ' को न छोड़ें।"
+      }
+    },
+    {
+      "id": "crouch-smoke",
+      "title": {
+        "en": "Stay low under smoke",
+        "hi": "धुएँ के नीचे झुके रहना"
+      },
+      "interaction": "crouch",
+      "points": 15,
+      "timeLimitSeconds": 20,
+      "group": "smoke",
+      "tone": "danger",
+      "headline": {
+        "en": "Smoke rising",
+        "hi": "धुआँ बढ़ रहा है"
+      },
+      "instruction": {
+        "en": "Thick smoke is filling the room. The air near the ceiling is hot and toxic. Crouch down low and stay low.",
+        "hi": "कमरे में घना धुआँ भर रहा है। छत के पास की हवा गर्म और ज़हरीली है। नीचे झुक जाएँ और झुके रहें।"
+      },
+      "fallbackInstruction": {
+        "en": "Thick smoke is filling the room. Press and hold Crouch to get below it.",
+        "hi": "कमरे में घना धुआँ भर रहा है। उसके नीचे रहने के लिए 'झुकें' बटन दबाए रखें।"
+      },
+      "success": {
+        "en": "Good. The air near the floor is cooler and cleaner.",
+        "hi": "बढ़िया। ज़मीन के पास की हवा ठंडी और ज़्यादा साफ़ होती है।"
+      },
+      "notes": "'Get low and go under the smoke': NFPA / American Red Cross fire-escape guidance."
+    },
+    {
+      "id": "move-exit",
+      "title": {
+        "en": "Follow the exit route",
+        "hi": "निकास के रास्ते पर चलना"
+      },
+      "interaction": "move",
+      "points": 10,
+      "group": "evacuate",
+      "headline": {
+        "en": "Evacuate",
+        "hi": "बाहर निकलें"
+      },
+      "instruction": {
+        "en": "Stay low and follow the green arrows to the nearest exit. Press and hold Move to walk.",
+        "hi": "झुके रहें और हरे तीरों के साथ सबसे पास के निकास तक जाएँ। चलने के लिए 'चलें' बटन दबाए रखें।"
+      },
+      "fallbackInstruction": {
+        "en": "Hold Crouch and Move together to follow the green arrows to the nearest exit.",
+        "hi": "हरे तीरों के साथ सबसे पास के निकास तक जाने के लिए 'झुकें' और 'चलें' दोनों दबाए रखें।"
+      },
+      "success": {
+        "en": "Stop! The fire has spread and blocked this exit.",
+        "hi": "रुकिए! आग फैल गई है और इस निकास का रास्ता बंद हो गया है।"
+      },
+      "hint": {
+        "en": "Stay low while you move. Standing up puts your head in the smoke.",
+        "hi": "चलते समय झुके रहें। खड़े होने से आपका सिर धुएँ में चला जाता है।"
+      }
+    },
+    {
+      "id": "choose-exit",
+      "title": {
+        "en": "Choose a safe way out",
+        "hi": "सुरक्षित रास्ता चुनना"
+      },
+      "interaction": "tap",
+      "points": 15,
+      "group": "evacuate",
+      "tone": "danger",
+      "headline": {
+        "en": "Exit blocked",
+        "hi": "निकास बंद"
+      },
+      "instruction": {
+        "en": "Fire blocks this exit. Tap the safe way out.",
+        "hi": "आग ने यह निकास बंद कर दिया है। सुरक्षित रास्ते पर टैप करें।"
+      },
+      "success": {
+        "en": "Right: Exit B is clear. Follow the new arrows.",
+        "hi": "सही: निकास B खुला है। नए तीरों के साथ चलें।"
+      },
+      "options": [
+        {
+          "id": "exit-a",
+          "label": {
+            "en": "Exit A (blocked)",
+            "hi": "निकास A (बंद)"
+          },
+          "outcome": "critical",
+          "criticalErrorId": "blocked-route"
+        },
+        {
+          "id": "lift",
+          "label": {
+            "en": "Lift",
+            "hi": "लिफ़्ट"
+          },
+          "outcome": "critical",
+          "criticalErrorId": "used-lift"
+        },
+        {
+          "id": "exit-b",
+          "label": {
+            "en": "Exit B",
+            "hi": "निकास B"
+          },
+          "outcome": "correct"
+        }
+      ]
+    },
+    {
+      "id": "reach-assembly",
+      "title": {
+        "en": "Reach the assembly point",
+        "hi": "असेंबली पॉइंट तक पहुँचना"
+      },
+      "interaction": "move",
+      "points": 15,
+      "group": "evacuate",
+      "headline": {
+        "en": "Get out",
+        "hi": "बाहर निकलें"
+      },
+      "instruction": {
+        "en": "Stay low and hold Move to follow the arrows through Exit B to the assembly point.",
+        "hi": "झुके रहें और निकास B से होते हुए असेंबली पॉइंट तक तीरों के साथ जाने के लिए 'चलें' दबाए रखें।"
+      },
+      "fallbackInstruction": {
+        "en": "Hold Crouch and Move to follow the arrows through Exit B to the assembly point.",
+        "hi": "निकास B से होते हुए असेंबली पॉइंट तक जाने के लिए 'झुकें' और 'चलें' दबाए रखें।"
+      },
+      "success": {
+        "en": "You are safe at the assembly point. Report to the fire warden.",
+        "hi": "आप असेंबली पॉइंट पर सुरक्षित हैं। फ़ायर वार्डन को सूचना दें।"
+      },
+      "hint": {
+        "en": "Stay low while you move. Standing up puts your head in the smoke.",
+        "hi": "चलते समय झुके रहें। खड़े होने से आपका सिर धुएँ में चला जाता है।"
+      }
+    },
+    {
+      "id": "stay-out",
+      "title": {
+        "en": "Do not go back in",
+        "hi": "वापस अंदर न जाना"
+      },
+      "interaction": "select-option",
+      "points": 10,
+      "group": "evacuate",
+      "tone": "danger",
+      "headline": {
+        "en": "At the assembly point",
+        "hi": "असेंबली पॉइंट पर"
+      },
+      "instruction": {
+        "en": "A co-worker says their bag and phone are still inside, next to the workstation. What do you do?",
+        "hi": "एक साथी कहता है कि उसका बैग और फ़ोन अभी अंदर वर्कस्टेशन के पास है। आप क्या करेंगे?"
+      },
+      "success": {
+        "en": "Correct. Nobody goes back in until the fire service says it is safe.",
+        "hi": "सही। जब तक फ़ायर सर्विस सुरक्षित न कहे, कोई वापस अंदर नहीं जाता।"
+      },
+      "options": [
+        {
+          "id": "go-back",
+          "label": {
+            "en": "Go back in quickly to get them",
+            "hi": "जल्दी से अंदर जाकर ले आऊँ"
+          },
+          "outcome": "critical",
+          "criticalErrorId": "re-entry"
+        },
+        {
+          "id": "tell-warden",
+          "label": {
+            "en": "Stay here and tell the fire warden",
+            "hi": "यहीं रुकूँ और फ़ायर वार्डन को बताऊँ"
+          },
+          "outcome": "correct"
+        },
+        {
+          "id": "send-coworker",
+          "label": {
+            "en": "Tell the co-worker to run in and get them",
+            "hi": "साथी से कहूँ कि दौड़कर ले आए"
+          },
+          "outcome": "wrong",
+          "feedback": {
+            "en": "Nobody should go back in, including your co-worker. Belongings can be replaced; lives cannot.",
+            "hi": "किसी को भी वापस अंदर नहीं जाना चाहिए, आपके साथी को भी नहीं। सामान दोबारा मिल सकता है, जान नहीं।"
+          }
+        }
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pass-meaning",
+      "prompt": {
+        "en": "What does PASS stand for when using a fire extinguisher?",
+        "hi": "अग्निशामक इस्तेमाल करते समय PASS का क्या मतलब है?"
+      },
+      "illustration": "pass",
+      "options": [
+        {
+          "id": "correct",
+          "label": {
+            "en": "Pull, Aim, Squeeze, Sweep",
+            "hi": "पिन खींचें, निशाना लगाएँ, हैंडल दबाएँ, दाएँ-बाएँ घुमाएँ"
+          },
+          "correct": true
+        },
+        {
+          "id": "push-spray",
+          "label": {
+            "en": "Push, Aim, Spray, Stop",
+            "hi": "धकेलें, निशाना लगाएँ, छिड़कें, रुकें"
+          },
+          "correct": false
+        },
+        {
+          "id": "alarm-shout",
+          "label": {
+            "en": "Pull, Alarm, Spray, Shout",
+            "hi": "खींचें, अलार्म, छिड़कें, चिल्लाएँ"
+          },
+          "correct": false
+        }
+      ],
+      "explanation": {
+        "en": "Pull the pin, Aim at the base, Squeeze the handle, Sweep from side to side.",
+        "hi": "पिन खींचें, आग की जड़ पर निशाना लगाएँ, हैंडल दबाएँ, दाएँ-बाएँ घुमाएँ।"
+      }
+    },
+    {
+      "id": "aim-base",
+      "prompt": {
+        "en": "Where should you aim the extinguisher?",
+        "hi": "अग्निशामक का निशाना कहाँ लगाना चाहिए?"
+      },
+      "illustration": "aim",
+      "options": [
+        {
+          "id": "top",
+          "label": {
+            "en": "At the top of the flames",
+            "hi": "लपटों के ऊपर"
+          },
+          "correct": false
+        },
+        {
+          "id": "base",
+          "label": {
+            "en": "At the base of the fire",
+            "hi": "आग की जड़ पर"
+          },
+          "correct": true
+        },
+        {
+          "id": "smoke",
+          "label": {
+            "en": "At the smoke",
+            "hi": "धुएँ पर"
+          },
+          "correct": false
+        }
+      ],
+      "explanation": {
+        "en": "The fuel burns at the base. Spraying the flames or smoke wastes the extinguisher.",
+        "hi": "चीज़ जड़ में जलती है। लपटों या धुएँ पर छिड़कने से अग्निशामक बेकार चला जाता है।"
+      }
+    },
+    {
+      "id": "smoke-low",
+      "prompt": {
+        "en": "Smoke fills the corridor on your way out. How should you move?",
+        "hi": "बाहर निकलते समय गलियारे में धुआँ भर जाता है। आपको कैसे चलना चाहिए?"
+      },
+      "illustration": "smoke",
+      "options": [
+        {
+          "id": "stand-run",
+          "label": {
+            "en": "Stand up straight and run",
+            "hi": "सीधे खड़े होकर दौड़ें"
+          },
+          "correct": false
+        },
+        {
+          "id": "wait",
+          "label": {
+            "en": "Stop and wait for the smoke to clear",
+            "hi": "रुककर धुआँ हटने का इंतज़ार करें"
+          },
+          "correct": false
+        },
+        {
+          "id": "stay-low",
+          "label": {
+            "en": "Stay low, close to the floor",
+            "hi": "झुके रहें, ज़मीन के पास"
+          },
+          "correct": true
+        }
+      ],
+      "explanation": {
+        "en": "Hot, toxic smoke rises. The cleaner air is near the floor.",
+        "hi": "गर्म और ज़हरीला धुआँ ऊपर उठता है। साफ़ हवा ज़मीन के पास होती है।"
+      },
+      "notes": "NFPA / American Red Cross: 'get low and go under the smoke'."
+    },
+    {
+      "id": "no-lift",
+      "prompt": {
+        "en": "The fire alarm sounds and you are on an upper floor. How do you get down?",
+        "hi": "फ़ायर अलार्म बज रहा है और आप ऊपर की मंज़िल पर हैं। नीचे कैसे जाएँगे?"
+      },
+      "illustration": "lift",
+      "options": [
+        {
+          "id": "stairs",
+          "label": {
+            "en": "By the stairs",
+            "hi": "सीढ़ियों से"
+          },
+          "correct": true
+        },
+        {
+          "id": "lift",
+          "label": {
+            "en": "By the lift, because it is faster",
+            "hi": "लिफ़्ट से, क्योंकि वह तेज़ है"
+          },
+          "correct": false
+        },
+        {
+          "id": "desk",
+          "label": {
+            "en": "Wait at your workplace",
+            "hi": "अपनी जगह पर इंतज़ार करें"
+          },
+          "correct": false
+        }
+      ],
+      "explanation": {
+        "en": "A lift can fail or open onto the fire. Always use the stairs during a fire.",
+        "hi": "लिफ़्ट बीच में रुक सकती है या आग वाली मंज़िल पर खुल सकती है। आग के समय हमेशा सीढ़ियों का इस्तेमाल करें।"
+      }
+    },
+    {
+      "id": "when-not-fight",
+      "prompt": {
+        "en": "When should you NOT try to fight a fire yourself?",
+        "hi": "आपको खुद आग बुझाने की कोशिश कब नहीं करनी चाहिए?"
+      },
+      "illustration": "escape",
+      "options": [
+        {
+          "id": "spreading",
+          "label": {
+            "en": "When it is spreading fast or blocking your way out",
+            "hi": "जब आग तेज़ी से फैल रही हो या बाहर का रास्ता रोक रही हो"
+          },
+          "correct": true
+        },
+        {
+          "id": "extinguisher-near",
+          "label": {
+            "en": "When an extinguisher is nearby",
+            "hi": "जब पास में अग्निशामक हो"
+          },
+          "correct": false
+        },
+        {
+          "id": "small-bin",
+          "label": {
+            "en": "When it is a small fire in a bin",
+            "hi": "जब कूड़ेदान में छोटी सी आग हो"
+          },
+          "correct": false
+        }
+      ],
+      "explanation": {
+        "en": "Only fight a small fire that is not spreading, with a clear way out behind you. Otherwise get out and let the fire service handle it.",
+        "hi": "केवल छोटी और न फैलने वाली आग ही बुझाएँ, और आपके पीछे बाहर का रास्ता खुला हो। नहीं तो बाहर निकलें और फ़ायर सर्विस को संभालने दें।"
+      },
+      "notes": "OSHA 29 CFR 1910.157 training guidance / NFPA: fight only incipient-stage fires with a clear escape route."
+    }
+  ],
+  "review": {
+    "source": "IS 2190:2010 (selection, installation and maintenance of first-aid fire extinguishers); NFPA 10; NBC 2016 Part 4 (fire and life safety); OSHA 29 CFR 1910.157 extinguisher training guidance; NFPA / American Red Cross fire-escape guidance.",
+    "notes": "Needs review by a certified fire-safety trainer before use: fire-class labelling for electrical fires in the Indian context (see step identify-fire), extinguisher colour bands, the 2 m working distance, and the Hindi wording. Santali is not translated yet and falls back to Hindi. Time limits (timeLimitSeconds) are training targets set by the app team, not from a standard; taking longer costs 20% of that step's points.",
+    "reviewedBy": null,
+    "reviewedAt": null
+  }
+}

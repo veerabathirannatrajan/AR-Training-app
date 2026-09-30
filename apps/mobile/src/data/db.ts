@@ -51,6 +51,23 @@ export interface SyncQueueItem {
   lastError: string | null;
 }
 
+/**
+ * A refresher micro-drill, scheduled 1, 3 and 7 days after passing a module. Due drills are
+ * offered on the home screen when the app opens (no push server needed, works offline).
+ */
+export interface DrillRecord {
+  id: string;
+  workerId: string;
+  moduleId: string;
+  /** 1, 3 or 7 */
+  dayOffset: number;
+  dueAt: number;
+  completedAt: number | null;
+  /** Correct answers out of the questions asked, once completed. */
+  score: number | null;
+  questions: number | null;
+}
+
 export interface SettingRecord {
   key: string;
   value: string;
@@ -64,6 +81,7 @@ export class TrainingDatabase extends Dexie {
   declare certificates: EntityTable<CertificateRecord, 'id'>;
   declare syncQueue: EntityTable<SyncQueueItem, 'seq'>;
   declare settings: EntityTable<SettingRecord, 'key'>;
+  declare drills: EntityTable<DrillRecord, 'id'>;
 
   constructor(name = 'ar-mining-training') {
     super(name);
@@ -75,6 +93,10 @@ export class TrainingDatabase extends Dexie {
       certificates: 'id, workerId, moduleId, issuedAt, status',
       syncQueue: '++seq, kind, workerId, nextAttemptAt',
       settings: 'key',
+    });
+    // v2 (Phase 2): refresher micro-drills.
+    this.version(2).stores({
+      drills: 'id, workerId, moduleId, dueAt, [workerId+moduleId]',
     });
   }
 }

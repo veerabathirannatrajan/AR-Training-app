@@ -5,4 +5,5 @@ export * from './api';
 export * from './auth';
 export * from './content';
 export * from './results';
+export * from './assessment';
 export * from './modules';

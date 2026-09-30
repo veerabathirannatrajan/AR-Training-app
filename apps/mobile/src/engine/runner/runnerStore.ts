@@ -1,8 +1,10 @@
 import {
-  totalPoints,
+  scoreAttempt,
+  type AttemptType,
   type LocalizedText,
   type ModuleResult,
   type ModuleStep,
+  type QuizAnswer,
   type RenderMode,
   type StepOutcome,
   type TrainingAction,
@@ -11,13 +13,14 @@ import {
 } from '@ar-training/shared';
 import { create } from 'zustand';
 import { db } from '../../data/db';
+import { scheduleRefresherDrills } from '../../data/drills';
 
 /** Points lost per mistake on a step (never below zero for that step). */
 export const MISTAKE_PENALTY = 5;
+/** Share of a step's points lost when it takes longer than its time limit. */
+export const SLOW_PENALTY_RATIO = 0.2;
 /** Pause after a completed step so the worker sees and hears the confirmation. */
 export const ADVANCE_DELAY_MS = 1600;
-/** Pass mark for assessed modules; the full assessment engine arrives with the Fire module. */
-export const PASS_MARK = 0.7;
 
 export type FeedbackTone = 'success' | 'mistake' | 'hint';
 
@@ -28,11 +31,28 @@ export interface Feedback {
   narrationId: string;
 }
 
-type RunnerStatus = 'idle' | 'running' | 'finished';
+export interface CriticalAlert {
+  id: number;
+  stepId: string;
+  errorId: string;
+}
+
+export type RunnerStatus = 'idle' | 'running' | 'quiz' | 'finished';
+
+interface StartArgs {
+  module: TrainingModuleContent;
+  workerId: string;
+  mode: RenderMode;
+  /** Retraining: only these steps are played; the others count as already done. */
+  focusStepIds?: readonly string[];
+  /** Facts assumed for skipped steps (e.g. which extinguisher is in hand). */
+  defaultFacts?: Readonly<Record<string, string>>;
+}
 
 interface RunnerState {
   status: RunnerStatus;
   module: TrainingModuleContent | null;
+  attemptType: AttemptType;
   sessionId: string | null;
   workerId: string | null;
   mode: RenderMode;
@@ -40,29 +60,48 @@ interface RunnerState {
   stepIndex: number;
   stepStartedAt: number;
   stepMistakes: number;
+  stepCriticalErrors: string[];
   /** The current step is complete and the runner is about to advance. */
   stepDone: boolean;
   /** 0..1 progress of the current step (hold bars, aim timers), set by the module scene. */
   stepProgress: number;
+  skippedStepIds: string[];
   outcomes: StepOutcome[];
   score: number;
+  /** Decisions made along the way, e.g. { "choose-extinguisher": "co2" }. */
+  facts: Record<string, string>;
+  criticalErrors: string[];
+  /** Options already tried and rejected, per step (for ✗ marks on trays and answer cards). */
+  triedOptions: Record<string, string[]>;
+  /** Set when a critical error happens; the HUD explains it until acknowledged. */
+  criticalAlert: CriticalAlert | null;
+  quizIndex: number;
+  quizAnswers: QuizAnswer[];
   feedback: Feedback | null;
   result: ModuleResult | null;
 
-  start: (args: {
-    module: TrainingModuleContent;
-    workerId: string;
-    mode: RenderMode;
-  }) => Promise<void>;
-  completeStep: (stepId: string, detail?: string) => void;
+  start: (args: StartArgs) => Promise<void>;
+  completeStep: (
+    stepId: string,
+    options?: { detail?: string; points?: number; message?: LocalizedText; tone?: FeedbackTone },
+  ) => void;
   recordMistake: (
     stepId: string,
     action: TrainingAction,
-    options?: { detail?: string; message?: LocalizedText; critical?: boolean },
+    options?: { detail?: string; message?: LocalizedText },
   ) => void;
+  recordCritical: (stepId: string, errorId: string, detail?: string) => void;
+  acknowledgeCritical: () => void;
+  /** Applies a choice on a decision step according to its content (correct / acceptable / wrong / critical). */
+  chooseOption: (stepId: string, optionId: string) => void;
   /** Shows (and speaks) the step's hint without counting a mistake. */
   showHint: (stepId: string) => void;
+  setFact: (key: string, value: string) => void;
   setStepProgress: (progress: number) => void;
+  /** Restarts the current step's clock (e.g. once the AR area has been placed). */
+  restartStepTimer: () => void;
+  answerQuiz: (questionId: string, optionId: string) => void;
+  nextQuestion: () => void;
   setMode: (mode: RenderMode) => void;
   abandon: () => Promise<void>;
   reset: () => void;
@@ -79,6 +118,7 @@ function clearAdvanceTimer() {
 const idle = {
   status: 'idle' as RunnerStatus,
   module: null,
+  attemptType: 'practice' as AttemptType,
   sessionId: null,
   workerId: null,
   mode: 'fallback3d' as RenderMode,
@@ -86,18 +126,35 @@ const idle = {
   stepIndex: 0,
   stepStartedAt: 0,
   stepMistakes: 0,
+  stepCriticalErrors: [] as string[],
   stepDone: false,
   stepProgress: 0,
-  outcomes: [],
+  skippedStepIds: [] as string[],
+  outcomes: [] as StepOutcome[],
   score: 0,
+  facts: {} as Record<string, string>,
+  criticalErrors: [] as string[],
+  triedOptions: {} as Record<string, string[]>,
+  criticalAlert: null,
+  quizIndex: 0,
+  quizAnswers: [] as QuizAnswer[],
   feedback: null,
   result: null,
 };
 
+const freshStep = () => ({
+  stepStartedAt: Date.now(),
+  stepMistakes: 0,
+  stepCriticalErrors: [] as string[],
+  stepDone: false,
+  stepProgress: 0,
+  feedback: null,
+});
+
 export const useRunnerStore = create<RunnerState>()((set, get) => {
   /** Appends an event to the local log; the sync engine uploads it later. */
   function logEvent(
-    step: ModuleStep,
+    stepId: string,
     action: TrainingAction,
     correct: boolean,
     critical: boolean,
@@ -111,7 +168,7 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
       sessionId,
       workerId,
       moduleId: module.id,
-      stepId: step.id,
+      stepId,
       action,
       correct,
       critical,
@@ -131,12 +188,50 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
     return step;
   }
 
+  function markTried(stepId: string, optionId: string) {
+    set((state) => {
+      const tried = state.triedOptions[stepId] ?? [];
+      if (tried.includes(optionId)) return {};
+      return { triedOptions: { ...state.triedOptions, [stepId]: [...tried, optionId] } };
+    });
+  }
+
+  function nextPlayableIndex(
+    module: TrainingModuleContent,
+    from: number,
+    skipped: readonly string[],
+  ) {
+    for (let index = from; index < module.steps.length; index += 1) {
+      const step = module.steps[index];
+      if (step != null && !skipped.includes(step.id)) return index;
+    }
+    return -1;
+  }
+
+  /** After the last step: the scenario quiz for assessments, otherwise the result. */
+  function endPractical() {
+    const { module, attemptType } = get();
+    if (attemptType === 'assessment' && (module?.quiz?.length ?? 0) > 0) {
+      set({ status: 'quiz', quizIndex: 0, stepDone: true, feedback: null });
+      return;
+    }
+    void finish();
+  }
+
   async function finish() {
     const state = get();
     const { module, sessionId, workerId } = state;
     if (module == null || sessionId == null || workerId == null) return;
     const now = Date.now();
-    const maxScore = totalPoints(module);
+    const score = scoreAttempt({
+      kind: module.kind,
+      attemptType: state.attemptType,
+      steps: state.outcomes,
+      quiz: state.quizAnswers,
+      quizTotal: module.quiz?.length ?? 0,
+      criticalErrors: state.criticalErrors,
+    });
+    const counted = state.outcomes.filter((outcome) => outcome.skipped !== true);
     const result: ModuleResult = {
       id: crypto.randomUUID(),
       sessionId,
@@ -144,17 +239,23 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
       moduleId: module.id,
       moduleVersion: module.version,
       mode: state.mode,
+      attemptType: state.attemptType,
       startedAt: state.startedAt,
       completedAt: now,
       score: state.score,
-      maxScore,
-      // Tutorials are completed, not passed.
-      passed: module.kind === 'tutorial' ? null : state.score >= maxScore * PASS_MARK,
+      maxScore: counted.reduce((sum, outcome) => sum + outcome.maxPoints, 0),
+      practicalPercent: score.practicalPercent,
+      quizPercent: score.quizPercent,
+      totalPercent: score.totalPercent,
+      passed: score.passed,
+      failReason: score.failReason,
+      criticalErrors: state.criticalErrors,
+      quiz: state.quizAnswers,
       steps: state.outcomes,
     };
-    set({ status: 'finished', result, stepDone: true });
+    set({ status: 'finished', result, stepDone: true, feedback: null });
     try {
-      await db.transaction('rw', db.results, db.sessions, db.syncQueue, async () => {
+      await db.transaction('rw', [db.results, db.sessions, db.syncQueue, db.drills], async () => {
         await db.results.add(result);
         await db.sessions.update(sessionId, { status: 'completed', endedAt: now });
         await db.syncQueue.add({
@@ -166,6 +267,7 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
           nextAttemptAt: now,
           lastError: null,
         });
+        if (result.passed === true) await scheduleRefresherDrills(workerId, module.id, now);
       });
     } catch (error) {
       console.error('[runner] could not save result', error);
@@ -175,19 +277,45 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
   return {
     ...idle,
 
-    async start({ module, workerId, mode }) {
+    async start({ module, workerId, mode, focusStepIds, defaultFacts }) {
       clearAdvanceTimer();
       const now = Date.now();
       const sessionId = crypto.randomUUID();
+      const retraining = focusStepIds != null && focusStepIds.length > 0;
+      const attemptType: AttemptType =
+        module.kind === 'tutorial' ? 'practice' : retraining ? 'retraining' : 'assessment';
+      const skippedStepIds = retraining
+        ? module.steps.filter((step) => !focusStepIds.includes(step.id)).map((step) => step.id)
+        : [];
+      // Skipped steps count as done so the scene shows their end state.
+      const skippedOutcomes: StepOutcome[] = skippedStepIds.map((stepId) => ({
+        stepId,
+        completed: true,
+        skipped: true,
+        mistakes: 0,
+        points: 0,
+        maxPoints: 0,
+        timeTakenMs: 0,
+        critical: false,
+      }));
+      const firstIndex = Math.max(0, nextPlayableIndex(module, 0, skippedStepIds));
       set({
         ...idle,
+        ...freshStep(),
         status: 'running',
         module,
+        attemptType,
         sessionId,
         workerId,
         mode,
         startedAt: now,
-        stepStartedAt: now,
+        stepIndex: firstIndex,
+        skippedStepIds,
+        outcomes: skippedOutcomes,
+        // Assumed choices only stand in for steps that are skipped (retraining).
+        facts: Object.fromEntries(
+          Object.entries(defaultFacts ?? {}).filter(([stepId]) => skippedStepIds.includes(stepId)),
+        ),
       });
       await db.sessions.add({
         id: sessionId,
@@ -195,26 +323,40 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
         moduleId: module.id,
         moduleVersion: module.version,
         mode,
+        attemptType,
         startedAt: now,
         endedAt: null,
         status: 'in-progress',
       });
     },
 
-    completeStep(stepId, detail) {
+    completeStep(stepId, options = {}) {
       const step = currentStep(stepId);
       if (step == null) return;
-      const { stepMistakes, stepStartedAt, module } = get();
-      logEvent(step, step.interaction, true, false, detail);
-      const points = Math.max(0, step.points - stepMistakes * MISTAKE_PENALTY);
+      const { stepMistakes, stepStartedAt, stepCriticalErrors, module } = get();
+      logEvent(step.id, step.interaction, true, false, options.detail);
+
+      const timeTakenMs = Date.now() - stepStartedAt;
+      const base = options.points ?? step.points;
+      const slow = step.timeLimitSeconds != null && timeTakenMs > step.timeLimitSeconds * 1000;
+      const critical = stepCriticalErrors.length > 0;
+      const points = critical
+        ? 0
+        : Math.max(
+            0,
+            base -
+              stepMistakes * MISTAKE_PENALTY -
+              (slow ? Math.round(step.points * SLOW_PENALTY_RATIO) : 0),
+          );
       const outcome: StepOutcome = {
         stepId: step.id,
         completed: true,
         mistakes: stepMistakes,
         points,
         maxPoints: step.points,
-        timeTakenMs: Date.now() - stepStartedAt,
-        critical: false,
+        timeTakenMs,
+        critical,
+        ...(critical ? { criticalErrorIds: stepCriticalErrors } : {}),
       };
       set((state) => ({
         stepDone: true,
@@ -223,8 +365,8 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
         score: state.score + points,
         feedback: {
           id: ++feedbackId,
-          tone: 'success',
-          text: step.success,
+          tone: options.tone ?? 'success',
+          text: options.message ?? step.success,
           narrationId: `${module?.id}.${step.id}.success`,
         },
       }));
@@ -232,20 +374,14 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
       clearAdvanceTimer();
       advanceTimer = setTimeout(() => {
         advanceTimer = null;
-        const { module: current, stepIndex, status } = get();
+        const { module: current, stepIndex, status, skippedStepIds } = get();
         if (current == null || status !== 'running') return;
-        if (stepIndex + 1 >= current.steps.length) {
-          void finish();
+        const next = nextPlayableIndex(current, stepIndex + 1, skippedStepIds);
+        if (next < 0) {
+          endPractical();
           return;
         }
-        set({
-          stepIndex: stepIndex + 1,
-          stepStartedAt: Date.now(),
-          stepMistakes: 0,
-          stepDone: false,
-          stepProgress: 0,
-          feedback: null,
-        });
+        set({ stepIndex: next, ...freshStep() });
       }, ADVANCE_DELAY_MS);
     },
 
@@ -253,7 +389,7 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
       const step = currentStep(stepId);
       if (step == null) return;
       const { module } = get();
-      logEvent(step, action, false, options.critical ?? false, options.detail);
+      logEvent(step.id, action, false, false, options.detail);
       const text = options.message ?? step.hint;
       set((state) => ({
         stepMistakes: state.stepMistakes + 1,
@@ -272,6 +408,57 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
       }));
     },
 
+    recordCritical(stepId, errorId, detail) {
+      const step = currentStep(stepId);
+      if (step == null) return;
+      logEvent(step.id, step.interaction, false, true, detail ?? errorId);
+      set((state) => ({
+        stepMistakes: state.stepMistakes + 1,
+        stepCriticalErrors: [...state.stepCriticalErrors, errorId],
+        criticalErrors: state.criticalErrors.includes(errorId)
+          ? state.criticalErrors
+          : [...state.criticalErrors, errorId],
+        criticalAlert: { id: ++feedbackId, stepId: step.id, errorId },
+        feedback: null,
+      }));
+    },
+
+    acknowledgeCritical() {
+      set({ criticalAlert: null });
+    },
+
+    chooseOption(stepId, optionId) {
+      const step = currentStep(stepId);
+      const option = step?.options?.find((candidate) => candidate.id === optionId);
+      if (step == null || option == null) return;
+      const state = get();
+      switch (option.outcome) {
+        case 'correct':
+          set({ facts: { ...state.facts, [step.id]: option.id } });
+          state.completeStep(step.id, { detail: option.id });
+          break;
+        case 'acceptable':
+          set({ facts: { ...state.facts, [step.id]: option.id } });
+          state.completeStep(step.id, {
+            detail: option.id,
+            points: option.points ?? Math.max(0, step.points - MISTAKE_PENALTY),
+            ...(option.feedback != null ? { message: option.feedback } : {}),
+          });
+          break;
+        case 'wrong':
+          markTried(step.id, option.id);
+          state.recordMistake(step.id, step.interaction, {
+            detail: option.id,
+            ...(option.feedback != null ? { message: option.feedback } : {}),
+          });
+          break;
+        case 'critical':
+          markTried(step.id, option.id);
+          state.recordCritical(step.id, option.criticalErrorId ?? option.id, option.id);
+          break;
+      }
+    },
+
     showHint(stepId) {
       const step = currentStep(stepId);
       if (step?.hint == null) return;
@@ -286,9 +473,37 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
       });
     },
 
+    setFact(key, value) {
+      set((state) => ({ facts: { ...state.facts, [key]: value } }));
+    },
+
     setStepProgress(progress) {
-      const rounded = Math.round(progress * 50) / 50;
+      const rounded = Math.round(Math.min(1, Math.max(0, progress)) * 50) / 50;
       if (get().stepProgress !== rounded) set({ stepProgress: rounded });
+    },
+
+    restartStepTimer() {
+      set({ stepStartedAt: Date.now() });
+    },
+
+    answerQuiz(questionId, optionId) {
+      const { status, module, quizAnswers } = get();
+      const question = module?.quiz?.find((candidate) => candidate.id === questionId);
+      if (status !== 'quiz' || question == null) return;
+      if (quizAnswers.some((answer) => answer.questionId === questionId)) return;
+      const correct = question.options.find((option) => option.id === optionId)?.correct === true;
+      logEvent(`quiz.${questionId}`, 'select-option', correct, false, optionId);
+      set({ quizAnswers: [...quizAnswers, { questionId, optionId, correct }] });
+    },
+
+    nextQuestion() {
+      const { status, module, quizIndex } = get();
+      if (status !== 'quiz' || module == null) return;
+      if (quizIndex + 1 >= (module.quiz?.length ?? 0)) {
+        void finish();
+        return;
+      }
+      set({ quizIndex: quizIndex + 1 });
     },
 
     setMode(mode) {
@@ -299,7 +514,7 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
       clearAdvanceTimer();
       const { status, sessionId } = get();
       set({ ...idle });
-      if (status === 'running' && sessionId != null) {
+      if ((status === 'running' || status === 'quiz') && sessionId != null) {
         await db.sessions.update(sessionId, { status: 'abandoned', endedAt: Date.now() });
       }
     },
@@ -316,7 +531,9 @@ export const runner = () => useRunnerStore.getState();
 /** The step the worker is on, or null when no module is running. */
 export function useCurrentStep(): ModuleStep | null {
   return useRunnerStore((state) =>
-    state.status === 'idle' ? null : (state.module?.steps[state.stepIndex] ?? null),
+    state.status === 'running' || state.status === 'quiz' || state.status === 'finished'
+      ? (state.module?.steps[state.stepIndex] ?? null)
+      : null,
   );
 }
 
@@ -337,7 +554,12 @@ export function useStepCurrent(stepId: string): boolean {
   );
 }
 
-/** True once `stepId` has been completed in this attempt. */
+/** True once `stepId` has been completed (or skipped in retraining) in this attempt. */
 export function useStepCompleted(stepId: string): boolean {
   return useRunnerStore((state) => state.outcomes.some((outcome) => outcome.stepId === stepId));
+}
+
+/** A decision recorded during the attempt (see `facts`). */
+export function useFact(key: string): string | undefined {
+  return useRunnerStore((state) => state.facts[key]);
 }
