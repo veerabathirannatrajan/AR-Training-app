@@ -31,6 +31,8 @@ export interface ContentReview {
 export interface ModuleStep {
   /** Unique within the module; also the key for audio files: audio/{lang}/{moduleId}.{stepId}.mp3 */
   id: string;
+  /** Short name for result screens and reports, e.g. "Tap the safety cone". */
+  title: LocalizedText;
   interaction: TrainingAction;
   points: number;
   instruction: LocalizedText;

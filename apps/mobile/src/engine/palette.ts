@@ -1,0 +1,23 @@
+/** Flat solid colours for low-poly geometry. No textures anywhere, so everything works offline. */
+export const PALETTE = {
+  white: '#ffffff',
+  safetyOrange: '#ff7a1a',
+  safetyOrangeDark: '#d95f0e',
+  safetyYellow: '#ffc93c',
+  ok: '#22c55e',
+  critical: '#ef4444',
+  steel: '#8a96a3',
+  steelDark: '#5b6672',
+  concrete: '#b9bec4',
+  wood: '#b07a45',
+  woodDark: '#8a5a2e',
+  matte: '#2b3139',
+  floor: '#a4acb4',
+  wall: '#e4e7ea',
+  gridMajor: '#7d8792',
+  gridMinor: '#b3bbc3',
+  sky: '#cfd6de',
+  smoke: '#9aa1a8',
+  hemiSky: '#ffffff',
+  hemiGround: '#6b5b4b',
+} as const;

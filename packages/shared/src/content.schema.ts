@@ -34,6 +34,7 @@ const trainingActionSchema = z.enum([
 
 export const moduleStepSchema = z.object({
   id: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'step ids are kebab-case'),
+  title: localizedTextSchema,
   interaction: trainingActionSchema,
   points: z.number().int().min(0),
   instruction: localizedTextSchema,
