@@ -9,7 +9,9 @@
   "status": {
     "notStarted": "Not started",
     "inProgress": "Started",
-    "completed": "Completed"
+    "completed": "Completed",
+    "passed": "Passed",
+    "failed": "Not passed"
   },
   "bestScore": "Best score {{score}}%",
   "attempts_one": "{{count}} attempt",
@@ -20,5 +22,17 @@
   "menu": {
     "open": "Open menu",
     "title": "Menu"
-  }
+  },
+  "drill": {
+    "due": "Refresher drill due",
+    "body": "{{module}}: 3 quick questions to keep it fresh.",
+    "start": "Start drill"
+  },
+  "install": {
+    "title": "Install the app",
+    "body": "Opens full screen from your home screen and works without internet.",
+    "button": "Install",
+    "manual": "In Chrome, tap ⋮ and then \"Install app\"."
+  },
+  "recommended": "Start here"
 }

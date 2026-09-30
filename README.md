@@ -3,9 +3,23 @@
 AR safety training for Jharkhand's mining, steel and mica workers (SIH 2026, PS SIH26041).
 See [PROJECT_BRIEF.md](PROJECT_BRIEF.md) for the full scope and phase plan.
 
-> Status: **Phase 1**. AR engine core, design system, language select, worker login,
-> home, offline shell (installable app), and the AR Basics practice module.
+> Status: **Phase 2**. AR engine, app shell (installable, offline), AR Basics practice module,
+> and the assessed **Fire & Explosion Response** module with the assessment engine.
 > The full setup and demo guide comes in Phase 7.
+
+## Training modules
+
+| Module                    | Kind     | What the worker does                                                                                                                                                |
+| ------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AR Basics                 | Practice | Place and turn the area, tap, drag, aim, press-and-hold, crouch                                                                                                     |
+| Fire & Explosion Response | Assessed | Raise the alarm, identify an electrical fire, pick the extinguisher, PASS (pull, aim, squeeze, sweep), stay low under smoke, evacuate past a blocked exit, stay out |
+
+**Assessment:** 60% practical (correct actions, order, time) + 40% scenario quiz (5 illustrated,
+narrated questions). Pass mark 70%. Any critical error (water on an electrical fire, a blocked
+exit or the lift, going back inside) fails the attempt, with an explanation. After a failure the
+worker can practise only the steps they missed; after a pass, refresher drills are scheduled for
+1, 3 and 7 days and offered on the home screen. All safety text lives in
+`packages/shared/content/modules/*.json` with source notes for expert review.
 
 ## Layout
 

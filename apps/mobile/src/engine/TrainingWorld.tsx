@@ -6,6 +6,7 @@ import { ARPlacement } from './ARPlacement';
 import { useEngineStore } from './engineStore';
 import { useRunnerStore } from './runner/runnerStore';
 import { FallbackEnvironment } from './fallback/FallbackEnvironment';
+import type { FallbackView } from './fallback/view';
 import { HeightTracker } from './HeightTracker';
 import { InputRouter } from './InputRouter';
 import { InteractionProvider } from './InteractionProvider';
@@ -51,13 +52,25 @@ function DebugProbe() {
  * area root, input, aiming and height tracking. Module content goes in as children and is
  * identical in both modes.
  */
-export function TrainingWorld({ mode, children }: { mode: RenderMode; children: ReactNode }) {
+export function TrainingWorld({
+  mode,
+  fallbackView,
+  children,
+}: {
+  mode: RenderMode;
+  fallbackView?: FallbackView | undefined;
+  children: ReactNode;
+}) {
   const placed = useEngineStore((state) => state.placement === 'placed');
   return (
     <InteractionProvider>
       <SceneRootProvider>
         <SceneLights />
-        {mode === 'ar' ? <ARPlacement /> : <FallbackEnvironment />}
+        {mode === 'ar' ? (
+          <ARPlacement />
+        ) : (
+          <FallbackEnvironment {...(fallbackView != null ? { view: fallbackView } : {})} />
+        )}
         <SceneRootGroup visible={placed}>{children}</SceneRootGroup>
         <InputRouter />
         <AimSystem />

@@ -8,9 +8,11 @@ import { angleDelta } from '../gestures';
 import { flatMaterial } from '../materials';
 import { PALETTE } from '../palette';
 import { deviceQuaternion, screenAngle } from './gyro';
+import { DEFAULT_FALLBACK_VIEW, type FallbackView } from './view';
 
-const EYE_HEIGHT = 1.6;
-const LOOK_AT_HEIGHT = 0.6;
+/** Wider than the AR camera: portrait phones otherwise see only a narrow slice of the scene. */
+const FALLBACK_FOV = 72;
+
 const CROUCH_DROP = 0.65;
 /** In look mode the orbit centre sits this far in front of the eye, so dragging turns the view. */
 const LOOK_RADIUS = 0.05;
@@ -31,21 +33,35 @@ const lookDirection = new Vector3();
  *   the centre of the screen can be pointed at things just like the phone in AR.
  * - Gyro: turn the phone to look around. Crouch button: lowers the eye height.
  */
-export function FallbackEnvironment() {
+export function FallbackEnvironment({ view = DEFAULT_FALLBACK_VIEW }: { view?: FallbackView }) {
   // The camera is read through get() so effects and frames mutate it outside React's render data.
   const get = useThree((state) => state.get);
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const gyroEnabled = useEngineStore((state) => state.gyroEnabled);
   const aimActive = useEngineStore((state) => state.aimActive);
+  const cameraDirected = useEngineStore((state) => state.cameraDirected);
   const crouchOffset = useRef(0);
   const hasDeviceOrientation = useRef(false);
   const gyroBase = useRef<{ inverseDevice: Quaternion; camera: Quaternion } | null>(null);
 
   useEffect(() => {
-    get().camera.position.set(0, EYE_HEIGHT, 2.4);
-    controlsRef.current?.target.set(0, LOOK_AT_HEIGHT, 0);
+    const camera = get().camera;
+    camera.position.set(...view.position);
+    if ('fov' in camera) {
+      const previousFov = camera.fov;
+      camera.fov = FALLBACK_FOV;
+      camera.updateProjectionMatrix();
+      controlsRef.current?.target.set(...view.target);
+      controlsRef.current?.update();
+      return () => {
+        camera.fov = previousFov;
+        camera.updateProjectionMatrix();
+      };
+    }
+    controlsRef.current?.target.set(...view.target);
     controlsRef.current?.update();
-  }, [get]);
+    return undefined;
+  }, [get, view]);
 
   // Switch between orbiting the area and looking around from where the camera stands.
   // (Skipped on mount, where the orbit centre is the middle of the training area.)
@@ -102,6 +118,8 @@ export function FallbackEnvironment() {
   }, [gyroEnabled, get]);
 
   useFrame(({ camera }, delta) => {
+    // A module steering the camera handles crouching itself.
+    if (engine().cameraDirected) return;
     // Crouch: ease the eye (and orbit centre) down while the button is held.
     const goal = engine().crouchHeld ? -CROUCH_DROP : 0;
     const next = crouchOffset.current + (goal - crouchOffset.current) * Math.min(1, delta * 8);
@@ -132,7 +150,7 @@ export function FallbackEnvironment() {
       <OrbitControls
         ref={controlsRef}
         makeDefault
-        enabled={!gyroEnabled}
+        enabled={!gyroEnabled && !cameraDirected}
         enablePan={false}
         // No coasting while aiming: the view must stop exactly where the finger lifts.
         enableDamping={!aimActive}

@@ -1,20 +1,29 @@
-import type { RenderMode } from '@ar-training/shared';
-import { ArrowDownToLine, Box, Compass, Hand, Move, ScanLine, ScanSearch } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { groupIndexOf, stepGroups, type RenderMode } from '@ar-training/shared';
+import { Box, Compass, Move, ScanLine, ScanSearch } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBackHandler, useNavigation } from '../app/navigation';
 import { useSession } from '../app/session';
-import { Button, ChipButton, Notice, Sheet } from '../design/components';
+import { Button } from '../design/components';
 import { cx } from '../design/cx';
 import { engine, useEngineStore } from '../engine/engineStore';
-import { CrouchButton, CrouchMeter, Crosshair, HoldButton } from '../engine/hud/controls';
+import {
+  CrouchButton,
+  CrouchMeter,
+  Crosshair,
+  HoldButton,
+  MoveButton,
+  SubStepIndicator,
+} from '../engine/hud/controls';
 import { FeedbackToast, InstructionCard } from '../engine/hud/InstructionCard';
+import { CriticalModal, HudSheet, OptionPanel, PauseMenu } from '../engine/hud/panels';
+import { QuizPanel } from '../engine/hud/QuizPanel';
 import { ResultPanel } from '../engine/hud/ResultPanel';
 import { TopBar } from '../engine/hud/TopBar';
 import { runner, useCurrentStep, useRunnerStore } from '../engine/runner/runnerStore';
 import { classifyARStartError, type ARStartError } from '../engine/xr/capabilities';
-import { XR_UI_PROPS } from '../engine/xr/xrUi';
 import { endXRSession, useXRSession } from '../engine/xr/useXRSession';
+import { XR_UI_PROPS } from '../engine/xr/xrUi';
 import { xrStore } from '../engine/xr/xrStore';
 import { useLanguage } from '../i18n';
 import { useLocalized } from '../i18n/localized';
@@ -28,11 +37,9 @@ const NO_STEP_UI: StepUi = {};
 function PlacementHint({ surfaceFound }: { surfaceFound: boolean }) {
   const { t } = useTranslation('training');
   return (
-    <div className={cx('glass placement-hint', surfaceFound && 'is-ready')} role="status">
+    <div className={cx('hud-glass placement-hint', surfaceFound && 'is-ready')} role="status">
       {surfaceFound ? <ScanLine size={22} /> : <ScanSearch size={22} className="pulse" />}
-      <span className="t-strong">
-        {surfaceFound ? t('placement.ready') : t('placement.searching')}
-      </span>
+      <span>{surfaceFound ? t('placement.ready') : t('placement.searching')}</span>
     </div>
   );
 }
@@ -48,27 +55,40 @@ export function TrainingScreen({ moduleId, mode }: { moduleId: string; mode: Ren
 
   const status = useRunnerStore((state) => state.status);
   const step = useCurrentStep();
-  const stepIndex = useRunnerStore((state) => state.stepIndex);
   const score = useRunnerStore((state) => state.score);
   const startedAt = useRunnerStore((state) => state.startedAt);
   const stepProgress = useRunnerStore((state) => state.stepProgress);
   const feedback = useRunnerStore((state) => state.feedback);
   const result = useRunnerStore((state) => state.result);
+  const criticalAlert = useRunnerStore((state) => state.criticalAlert);
+  const triedOptions = useRunnerStore((state) => state.triedOptions);
+  const outcomes = useRunnerStore((state) => state.outcomes);
+  const quizIndex = useRunnerStore((state) => state.quizIndex);
+  const quizAnswers = useRunnerStore((state) => state.quizAnswers);
   const placement = useEngineStore((state) => state.placement);
   const gyroEnabled = useEngineStore((state) => state.gyroEnabled);
   const gyroAvailable = useEngineStore((state) => state.gyroAvailable);
   const standingHeight = useEngineStore((state) => state.standingHeight);
 
-  const [sheet, setSheet] = useState<'exit' | 'language' | null>(null);
+  const [sheet, setSheet] = useState<'pause' | 'language' | null>(null);
   const [hiddenFeedbackId, setHiddenFeedbackId] = useState<number | null>(null);
   const [resumeError, setResumeError] = useState<ARStartError | null>(null);
 
-  const startAttempt = useCallback(() => {
-    if (definition == null || worker == null) return;
-    void runner().start({ module: definition.content, workerId: worker.workerId, mode });
+  const startAttempt = useCallback(
+    (focusStepIds?: string[]) => {
+      if (definition == null || worker == null) return;
+      void runner().start({
+        module: definition.content,
+        workerId: worker.workerId,
+        mode,
+        ...(focusStepIds != null ? { focusStepIds } : {}),
+        ...(definition.defaultFacts != null ? { defaultFacts: definition.defaultFacts } : {}),
+      });
+    },
     // `mode` is read once per attempt; switching AR → 3D mid-attempt goes through setMode.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [definition, worker]);
+    [definition, worker],
+  );
 
   // Start the attempt after mount. Deferring it means React StrictMode's mount → unmount →
   // mount in development starts exactly one session.
@@ -92,19 +112,23 @@ export function TrainingScreen({ moduleId, mode }: { moduleId: string; mode: Ren
     runner().setMode(mode);
   }, [mode]);
 
-  // Speak each instruction when its step starts (after any confirmation that is still playing).
+  // In AR the scenario starts once the training area is placed.
+  const waitingForPlacement =
+    mode === 'ar' && placement !== 'placed' && step?.interaction !== 'place';
+
+  // Speak each instruction when its step starts (after any confirmation still playing).
   const stepId = step?.id;
   useEffect(() => {
-    if (status !== 'running' || step == null) return;
+    if (status !== 'running' || step == null || waitingForPlacement) return;
     const useFallbackText = mode === 'fallback3d' && step.fallbackInstruction != null;
     const text =
       useFallbackText && step.fallbackInstruction ? step.fallbackInstruction : step.instruction;
     speak(narrationFromText(`${moduleId}.${step.id}${useFallbackText ? '.3d' : ''}`, text), lang, {
       queue: true,
     });
-    // Re-speak only when the step, mode or language changes.
+    // Re-speak only when the step, mode, language or placement changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, stepId, mode, lang, moduleId]);
+  }, [status, stepId, mode, lang, moduleId, waitingForPlacement]);
 
   // Speak feedback (confirmation, mistake, hint) and hide its toast after a moment.
   useEffect(() => {
@@ -117,20 +141,30 @@ export function TrainingScreen({ moduleId, mode }: { moduleId: string; mode: Ren
   }, [feedback?.id]);
 
   const onBack = useCallback(() => {
-    setSheet((current) => (current == null ? 'exit' : null));
+    setSheet((current) => (current == null ? 'pause' : null));
     return true;
   }, []);
   useBackHandler(onBack);
+
+  const groups = useMemo(
+    () => (definition != null ? stepGroups(definition.content) : []),
+    [definition],
+  );
 
   if (definition == null || worker == null) return null;
   const { content } = definition;
   const ui = (step != null ? definition.stepUi[step.id] : undefined) ?? NO_STEP_UI;
   const running = status === 'running';
   const inFallback = mode === 'fallback3d';
-  const arStopped = mode === 'ar' && xrSession == null && running;
-  const waitingForPlacement = mode === 'ar' && xrSession != null && placement !== 'placed';
+  const arStopped = mode === 'ar' && xrSession == null && (running || status === 'quiz');
   const calibratingCrouch = ui.crouch === true && mode === 'ar' && standingHeight == null;
   const visibleFeedback = feedback != null && feedback.id !== hiddenFeedbackId ? feedback : null;
+  const completedIds = outcomes.map((outcome) => outcome.stepId);
+  const groupIndex = step != null ? groupIndexOf(content, step.id) : 0;
+  const groupsDone = groups.filter((group) =>
+    group.every((id) => completedIds.includes(id)),
+  ).length;
+  const quizQuestion = content.quiz?.[quizIndex];
 
   const replayInstruction = () => {
     if (step == null) return;
@@ -145,6 +179,14 @@ export function TrainingScreen({ moduleId, mode }: { moduleId: string; mode: Ren
     void runner().abandon();
     endXRSession();
     useNavigation.getState().back();
+  };
+
+  const restart = () => {
+    setSheet(null);
+    engine().reset(mode);
+    void runner()
+      .abandon()
+      .then(() => startAttempt());
   };
 
   const resumeAR = async () => {
@@ -163,94 +205,150 @@ export function TrainingScreen({ moduleId, mode }: { moduleId: string; mode: Ren
     useNavigation.getState().replace({ name: 'training', moduleId, mode: 'fallback3d' });
   };
 
-  const practiceAgain = () => {
-    engine().reset(mode);
-    startAttempt();
-  };
-
   const goHome = () => {
     endXRSession();
     runner().reset();
     useNavigation.getState().reset({ name: 'home' });
   };
 
-  const trayItems = [
+  const again = (focusStepIds?: string[]) => {
+    engine().reset(mode);
+    startAttempt(focusStepIds);
+  };
+
+  // What the bottom of the screen shows for this step.
+  const showModuleTray = running && ui.moduleTray === true && definition.Tray != null;
+  const showOptions = running && step?.options != null && ui.options !== 'scene' && !showModuleTray;
+  const trayChips = [
     mode === 'ar' && placement === 'placed' && (
-      <ChipButton
+      <button
         key="move"
-        className="glass"
-        icon={<Move size={18} />}
+        type="button"
+        className="hud-chip-button"
         onClick={() => engine().requestReposition()}
       >
+        <Move size={18} />
         {t('placement.reposition')}
-      </ChipButton>
+      </button>
     ),
     inFallback && (
-      <ChipButton
+      <button
         key="gyro"
-        className={cx('glass', gyroEnabled && 'chip-accent')}
-        icon={<Compass size={18} />}
+        type="button"
+        className={cx('hud-chip-button', gyroEnabled && 'is-active')}
         aria-pressed={gyroEnabled}
         disabled={!gyroAvailable}
         title={gyroAvailable ? undefined : t('controls.gyroUnavailable')}
         onClick={() => engine().setGyroEnabled(!gyroEnabled)}
       >
+        <Compass size={18} />
         {t('controls.gyro')}
-      </ChipButton>
+      </button>
     ),
   ].filter(Boolean);
   const showHold = running && ui.hold === true;
+  const showMove = running && ui.move === true;
   const showCrouchButton = running && ui.crouch === true && inFallback;
+  const Tray = definition.Tray;
+  const Overlay = definition.Overlay;
 
   return (
     <div className="hud">
       <TopBar
+        icon={definition.icon}
         title={localize(content.title).text}
-        stepCurrent={Math.min(stepIndex + 1, content.steps.length)}
-        stepTotal={content.steps.length}
+        groupCurrent={Math.min(groupIndex + 1, groups.length)}
+        groupTotal={groups.length}
+        progress={groups.length === 0 ? 0 : groupsDone / groups.length}
         startedAt={startedAt}
         finished={status === 'finished'}
         score={score}
-        onExit={() => setSheet('exit')}
         onVoice={replayInstruction}
-        onLanguage={() => setSheet('language')}
-      />
+        onPause={() => setSheet('pause')}
+      >
+        {running && step != null && !waitingForPlacement ? (
+          <InstructionCard
+            step={step}
+            inFallback={inFallback}
+            progress={stepProgress}
+            showProgress={ui.progress === true && !calibratingCrouch}
+          />
+        ) : (
+          <span className="grow" />
+        )}
+      </TopBar>
 
-      {running && step != null && (
-        <InstructionCard
-          step={step}
-          inFallback={inFallback}
-          progress={stepProgress}
-          showProgress={ui.progress === true && !calibratingCrouch}
-        />
-      )}
       {visibleFeedback != null && <FeedbackToast feedback={visibleFeedback} />}
-
       {running && ui.crosshair === true && <Crosshair />}
-      {waitingForPlacement && running && (
+      {running && mode === 'ar' && xrSession != null && placement !== 'placed' && (
         <PlacementHint surfaceFound={placement === 'surface-found'} />
       )}
 
       <div className="hud-bottom">
+        <div className="hud-bottom-row">
+          {running && step != null && (
+            <SubStepIndicator module={content} step={step} completedIds={completedIds} />
+          )}
+          {running && Overlay != null && <Overlay />}
+        </div>
         {running && ui.crouch === true && mode === 'ar' && <CrouchMeter />}
-        {(trayItems.length > 0 || showHold || showCrouchButton) && (
-          <div className="clay tray hud-tray" {...XR_UI_PROPS}>
-            <div className="row wrap grow">{trayItems}</div>
-            {showHold && <HoldButton icon={<Hand size={26} />} />}
-            {showCrouchButton && <CrouchButton icon={<ArrowDownToLine size={26} />} />}
-          </div>
+
+        {showModuleTray && Tray != null ? (
+          <Tray />
+        ) : showOptions && step != null ? (
+          <OptionPanel
+            step={step}
+            tried={triedOptions[step.id] ?? []}
+            onChoose={(optionId) => runner().chooseOption(step.id, optionId)}
+          />
+        ) : (
+          (trayChips.length > 0 || showHold || showMove || showCrouchButton) && (
+            <div className="hud-tray" {...XR_UI_PROPS}>
+              <div className="hud-tray-chips">{trayChips}</div>
+              {showCrouchButton && <CrouchButton />}
+              {showMove && <MoveButton />}
+              {showHold && <HoldButton label={ui.holdLabel ?? 'hold'} />}
+            </div>
+          )
         )}
       </div>
 
-      {status === 'finished' && result != null && (
-        <ResultPanel module={content} result={result} onHome={goHome} onAgain={practiceAgain} />
+      {status === 'quiz' && quizQuestion != null && (
+        <QuizPanel
+          moduleId={content.id}
+          question={quizQuestion}
+          index={quizIndex}
+          total={content.quiz?.length ?? 0}
+          answer={quizAnswers.find((answer) => answer.questionId === quizQuestion.id)}
+          illustrations={definition.illustrations}
+          onAnswer={(optionId) => runner().answerQuiz(quizQuestion.id, optionId)}
+          onNext={() => runner().nextQuestion()}
+        />
       )}
 
-      {arStopped && sheet == null && (
-        <Sheet title={t('arStopped.title')} onClose={() => undefined}>
-          <p>{t('arStopped.body')}</p>
+      {status === 'finished' && result != null && (
+        <ResultPanel
+          module={content}
+          result={result}
+          onHome={goHome}
+          onAgain={() => again()}
+          onRetrain={(stepIds) => again(stepIds)}
+        />
+      )}
+
+      {criticalAlert != null && (
+        <CriticalModal
+          module={content}
+          alert={criticalAlert}
+          onAcknowledge={() => runner().acknowledgeCritical()}
+        />
+      )}
+
+      {arStopped && sheet == null && criticalAlert == null && (
+        <HudSheet title={t('arStopped.title')}>
+          <p className="t-muted">{t('arStopped.body')}</p>
           {resumeError != null && (
-            <Notice tone="critical">{t(`deviceCheck.errors.${resumeError}`)}</Notice>
+            <p className="hud-warning">{t(`deviceCheck.errors.${resumeError}`)}</p>
           )}
           <div className="sheet-actions">
             <Button block icon={<ScanLine size={20} />} onClick={() => void resumeAR()}>
@@ -260,21 +358,16 @@ export function TrainingScreen({ moduleId, mode }: { moduleId: string; mode: Ren
               {t('arStopped.switch3d')}
             </Button>
           </div>
-        </Sheet>
+        </HudSheet>
       )}
 
-      {sheet === 'exit' && (
-        <Sheet title={t('exit.title')} onClose={() => setSheet(null)}>
-          <p>{t('exit.body')}</p>
-          <div className="sheet-actions">
-            <Button variant="danger" block onClick={leave}>
-              {t('exit.leave')}
-            </Button>
-            <Button variant="secondary" block onClick={() => setSheet(null)}>
-              {t('exit.stay')}
-            </Button>
-          </div>
-        </Sheet>
+      {sheet === 'pause' && (
+        <PauseMenu
+          onResume={() => setSheet(null)}
+          onRestart={restart}
+          onLanguage={() => setSheet('language')}
+          onLeave={leave}
+        />
       )}
       {sheet === 'language' && <LanguageSheet onClose={() => setSheet(null)} />}
     </div>

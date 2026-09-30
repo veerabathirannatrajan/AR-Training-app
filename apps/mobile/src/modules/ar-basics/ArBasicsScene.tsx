@@ -66,7 +66,8 @@ function PlaceStep() {
   const placed = useEngineStore((state) => state.placement === 'placed');
   const mode = useEngineStore((state) => state.mode);
   useEffect(() => {
-    if (active && placed) runner().completeStep('place', mode === 'ar' ? 'ar-hit-test' : '3d-auto');
+    if (active && placed)
+      runner().completeStep('place', { detail: mode === 'ar' ? 'ar-hit-test' : '3d-auto' });
   }, [active, placed, mode]);
   return null;
 }
@@ -84,7 +85,7 @@ function RotateStep() {
     const progress = turned / ROTATE_GOAL_RAD;
     runner().setStepProgress(Math.min(1, progress));
     if (progress >= 1)
-      runner().completeStep('rotate', `${Math.round((turned * 180) / Math.PI)}deg`);
+      runner().completeStep('rotate', { detail: `${Math.round((turned * 180) / Math.PI)}deg` });
   }, [active, turned]);
   return null;
 }
@@ -106,7 +107,7 @@ function TapStep() {
   useInteractable(cone, {
     id: 'cone',
     enabled: active,
-    onTap: () => runner().completeStep('tap-cone', 'cone'),
+    onTap: () => runner().completeStep('tap-cone', { detail: 'cone' }),
   });
   useInteractable(crate, { id: 'crate', enabled: active, onTap: wrong('crate') });
   useInteractable(barrel, { id: 'barrel', enabled: active, onTap: wrong('barrel') });
@@ -147,7 +148,7 @@ function DragStep() {
         const toStand = Math.hypot(point.x - STAND[0], point.z - STAND[2]);
         if (toStand <= DROP_RADIUS) {
           state.current = 'on-stand';
-          runner().completeStep('drag-helmet', `${toStand.toFixed(2)}m`);
+          runner().completeStep('drag-helmet', { detail: `${toStand.toFixed(2)}m` });
           return;
         }
         state.current = 'home';
@@ -278,7 +279,10 @@ function CrouchStep() {
       : Math.max(0, crouchTime.current - delta);
     runner().setStepProgress(crouchTime.current / CROUCH_SECONDS);
     if (crouchTime.current >= CROUCH_SECONDS) {
-      runner().completeStep('crouch', state.deviceHeight?.toFixed(2) ?? undefined);
+      runner().completeStep(
+        'crouch',
+        state.deviceHeight != null ? { detail: state.deviceHeight.toFixed(2) } : {},
+      );
     }
   });
 

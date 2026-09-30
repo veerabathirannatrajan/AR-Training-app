@@ -1,0 +1,23 @@
+{
+  "labels": {
+    "callPoint": "Fire alarm",
+    "tapToRaise": "Tap to raise the alarm",
+    "tapToPickUp": "Tap to pick up",
+    "pullPin": "Pull the pin",
+    "exitA": "Exit A",
+    "exitB": "Exit B",
+    "blocked": "Blocked by fire",
+    "lift": "Lift",
+    "assembly": "Assembly point",
+    "warden": "Fire warden"
+  },
+  "tray": {
+    "title": "Choose an extinguisher",
+    "tapAgain": "Tap again to pick up",
+    "inHand": "In hand"
+  },
+  "smoke": {
+    "rising": "Smoke rising · Stay low",
+    "inSmoke": "You are in the smoke · Get low!"
+  }
+}

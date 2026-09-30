@@ -38,6 +38,7 @@ export function SmokePuffs({
   thickness = 0.5,
   visible = true,
   seed = 7,
+  opacity = 0.85,
 }: {
   count?: number;
   radius?: number;
@@ -45,6 +46,7 @@ export function SmokePuffs({
   thickness?: number;
   visible?: boolean;
   seed?: number;
+  opacity?: number;
 }) {
   const ref = useRef<InstancedMesh>(null);
   const puffs = useMemo<Puff[]>(() => {
@@ -84,7 +86,7 @@ export function SmokePuffs({
   return (
     <instancedMesh
       ref={ref}
-      args={[puffGeometry, flatMaterial(PALETTE.smoke, { opacity: 0.85 }), count]}
+      args={[puffGeometry, flatMaterial(PALETTE.smoke, { opacity }), count]}
       visible={visible}
       frustumCulled={false}
     />

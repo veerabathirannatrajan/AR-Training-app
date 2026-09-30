@@ -11,6 +11,7 @@ import { xrStore } from './engine/xr/xrStore';
 import { overlayRoot } from './lib/overlayRoot';
 import { findModule } from './modules/registry';
 import { DeviceCheckScreen } from './screens/DeviceCheckScreen';
+import { DrillScreen } from './screens/DrillScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { LanguageScreen } from './screens/LanguageScreen';
 import { LoginScreen } from './screens/LoginScreen';
@@ -34,6 +35,8 @@ function Screen({ route }: { route: Route }) {
       return <DeviceCheckScreen moduleId={route.moduleId} />;
     case 'training':
       return <TrainingScreen moduleId={route.moduleId} mode={route.mode} />;
+    case 'drill':
+      return <DrillScreen drillId={route.drillId} />;
   }
 }
 
@@ -56,7 +59,11 @@ function Stage({ route }: { route: Route }) {
     >
       <XR store={xrStore}>
         {training != null && definition != null && sessionId != null && (
-          <TrainingWorld key={`${training.mode}:${sessionId}`} mode={training.mode}>
+          <TrainingWorld
+            key={`${training.mode}:${sessionId}`}
+            mode={training.mode}
+            fallbackView={definition.fallbackView}
+          >
             <definition.Scene />
           </TrainingWorld>
         )}

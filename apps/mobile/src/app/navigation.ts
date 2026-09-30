@@ -9,7 +9,8 @@ export type Route =
   | { name: 'home' }
   | { name: 'module-intro'; moduleId: string }
   | { name: 'device-check'; moduleId: string }
-  | { name: 'training'; moduleId: string; mode: RenderMode };
+  | { name: 'training'; moduleId: string; mode: RenderMode }
+  | { name: 'drill'; drillId: string };
 
 interface NavigationState {
   stack: Route[];

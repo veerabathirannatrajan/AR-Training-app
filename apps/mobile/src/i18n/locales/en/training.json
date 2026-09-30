@@ -35,13 +35,18 @@
     "step": "Step {{current}}/{{total}}",
     "points": "{{score}} pts",
     "elapsed": "Time",
-    "exit": "Leave training"
+    "exit": "Leave training",
+    "stepOf": "Step {{current}} of {{total}}",
+    "score": "Score",
+    "pause": "Pause"
   },
   "controls": {
     "hold": "Hold",
     "crouch": "Crouch",
     "gyro": "Gyro",
-    "gyroUnavailable": "No gyroscope on this phone"
+    "gyroUnavailable": "No gyroscope on this phone",
+    "squeeze": "Squeeze",
+    "move": "Move"
   },
   "crouch": {
     "standUp": "Stand up straight",
@@ -77,5 +82,56 @@
   },
   "feedback": {
     "wrongObject": "That is the {{name}}."
+  },
+  "pause": {
+    "title": "Paused",
+    "resume": "Resume",
+    "restart": "Restart from the beginning",
+    "language": "Language and voice",
+    "exit": "Leave training"
+  },
+  "critical": {
+    "label": "Critical error",
+    "failNotice": "This attempt now counts as not passed. Keep going to finish the training.",
+    "continue": "I understand"
+  },
+  "options": {
+    "choose": "Choose an answer"
+  },
+  "quiz": {
+    "title": "Scenario quiz",
+    "progress": "Question {{current}} of {{total}}",
+    "correct": "Correct",
+    "incorrect": "Not quite",
+    "next": "Next question",
+    "finish": "See my result",
+    "listen": "Listen to the question"
+  },
+  "assessment": {
+    "passed": "Passed",
+    "failed": "Not passed",
+    "retrainingDone": "Practice complete",
+    "total": "Total score",
+    "practical": "Practical",
+    "quizPart": "Quiz",
+    "weights": "60% practical + 40% quiz",
+    "passMark": "Pass mark {{mark}}%",
+    "criticalTitle": "Critical errors",
+    "criticalReason": "A critical error fails the attempt, even with a high score.",
+    "belowMark": "Your score is below the pass mark.",
+    "stepsTitle": "Step by step",
+    "correctAction": "What to do",
+    "retrain": "Practise the steps I missed",
+    "retrainNext": "Now take the full assessment again to pass.",
+    "tryAgain": "Take the assessment again",
+    "home": "Back to home",
+    "drillsScheduled": "Refresher drills are set for 1, 3 and 7 days from now.",
+    "skipped": "Not in this practice"
+  },
+  "drill": {
+    "title": "Refresher drill",
+    "done": "Drill complete",
+    "score": "{{correct}} of {{total}} correct",
+    "home": "Back to home"
   }
 }

@@ -1,5 +1,5 @@
 import { Vector3, type Object3D, type Ray } from 'three';
-import { engine } from '../engineStore';
+import { engine, signals } from '../engineStore';
 import {
   angleBetween,
   dragRotateDelta,
@@ -116,12 +116,18 @@ export class InputController {
     }
 
     const state = engine();
-    const canRotate = state.mode === 'ar' && state.placement === 'placed';
+    const swiping = state.gestureMode === 'swipe';
+    const canRotate = state.mode === 'ar' && state.placement === 'placed' && !swiping;
     if ((pointer.kind === 'tap' || pointer.kind === 'empty') && pointer.moved && canRotate) {
       pointer.kind = 'rotate';
     }
 
-    if (pointer.kind === 'drag') {
+    if (swiping && pointer.kind !== 'drag' && pointer.kind !== 'place') {
+      // Swipe mode: report the horizontal swing of the finger (same sign convention as rotate).
+      // In 3D mode a canvas drag also turns the view, which is measured separately.
+      if (state.mode === 'ar')
+        signals.swipe += dragRotateDelta(pointer.previousDirection, direction);
+    } else if (pointer.kind === 'drag') {
       const local = this.dragPointLocal(pointer);
       if (local != null) pointer.config?.drag?.onMove(local);
     } else if (pointer.kind === 'rotate' && this.pointers.size === 1) {
@@ -163,7 +169,9 @@ export class InputController {
   applyTwist(): void {
     const state = engine();
     const root = this.sceneRootRef.current;
-    if (state.mode !== 'ar' || state.placement !== 'placed' || root == null) return;
+    if (state.mode !== 'ar' || state.placement !== 'placed' || state.gestureMode === 'swipe')
+      return;
+    if (root == null) return;
     if (this.pointers.size !== 2) return;
     const [a, b] = [...this.pointers.values()] as [PointerState, PointerState];
     const twistable = (pointer: PointerState) =>
