@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { LocalizedText } from './content';
-import { resolveText, totalPoints } from './content';
+import { fillText, resolveText, totalPoints } from './content';
 import { trainingModuleSchema } from './content.schema';
 import { MODULE_CONTENT } from './modules';
 
@@ -41,6 +41,34 @@ describe.each(MODULE_CONTENT.map((module) => [module.id, module] as const))(
     });
   },
 );
+
+describe('fillText', () => {
+  const template: LocalizedText = { en: 'Missing: {{items}}.', hi: 'कमी है: {{items}}।' };
+  const items: LocalizedText = { en: 'helmet, harness', hi: 'हेलमेट, हार्नेस' };
+
+  it('fills each language from the matching value', () => {
+    expect(fillText(template, { items })).toEqual({
+      en: 'Missing: helmet, harness.',
+      hi: 'कमी है: हेलमेट, हार्नेस।',
+    });
+  });
+
+  it('marks a Santali result as a draft when a value has no reviewed Santali', () => {
+    const withSantali: LocalizedText = {
+      ...template,
+      sat: { text: 'ᱵᱟᱝ: {{items}}', needsReview: false, source: 'native-speaker:test' },
+    };
+    expect(fillText(withSantali, { items }).sat).toEqual({
+      text: 'ᱵᱟᱝ: हेलमेट, हार्नेस',
+      needsReview: true,
+      source: 'native-speaker:test',
+    });
+  });
+
+  it('leaves unknown placeholders as they are', () => {
+    expect(fillText(template, {}).en).toBe('Missing: {{items}}.');
+  });
+});
 
 describe('resolveText', () => {
   const text: LocalizedText = { en: 'Start', hi: 'शुरू करें' };

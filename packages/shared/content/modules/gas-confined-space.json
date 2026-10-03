@@ -1,0 +1,896 @@
+{
+  "id": "gas-confined-space",
+  "version": 1,
+  "kind": "assessed",
+  "title": {
+    "en": "Gas Leak & Confined Space",
+    "hi": "गैस रिसाव और बंद जगह में प्रवेश"
+  },
+  "summary": {
+    "en": "LPG leaks beside an underground valve pit. Mark the danger, clear the area without a spark, then make the pit safe and run a protected entry, right up to a rescue.",
+    "hi": "एक भूमिगत वाल्व पिट के पास LPG रिस रही है। खतरा पहचानें, बिना चिंगारी के जगह खाली करें, फिर पिट को सुरक्षित बनाकर सही तरीके से अंदर जाने की तैयारी करें, बचाव तक।"
+  },
+  "briefing": {
+    "en": "LPG is leaking from a pipeline beside an underground valve pit. LPG is heavier than air and catches fire easily. Find the hazard zones, stop your co-worker from making a spark, and get out upwind. Once the line is shut off, the valve in the pit must be repaired: test the air in the right order, ventilate, sign the entry permit, give the entrant the right equipment and post an attendant outside. Then handle an emergency. Entering without an attendant, or going in to rescue without breathing apparatus, fails the assessment. A short quiz follows.",
+    "hi": "एक भूमिगत वाल्व पिट के पास पाइपलाइन से LPG रिस रही है। LPG हवा से भारी होती है और आसानी से आग पकड़ लेती है। खतरे के क्षेत्र पहचानें, अपने साथी को चिंगारी करने से रोकें और हवा आने की दिशा में बाहर निकलें। लाइन बंद होने के बाद पिट के अंदर का वाल्व ठीक करना है: हवा की सही क्रम में जाँच करें, वेंटिलेशन चालू करें, प्रवेश परमिट पर हस्ताक्षर करें, अंदर जाने वाले को सही उपकरण दें और बाहर एक अटेंडेंट तैनात करें। फिर एक आपात स्थिति संभालें। बिना अटेंडेंट के अंदर जाना, या बिना साँस के उपकरण के बचाने अंदर जाना, आपको फ़ेल कर देगा। अंत में एक छोटी प्रश्नोत्तरी है।"
+  },
+  "objectives": [
+    {
+      "en": "Recognise gas hazard zones and where heavy gas collects",
+      "hi": "गैस के खतरे वाले क्षेत्र और भारी गैस के जमा होने की जगह पहचानना"
+    },
+    {
+      "en": "Warn others, avoid sparks and get out upwind",
+      "hi": "दूसरों को सावधान करना, चिंगारी से बचना और हवा आने की दिशा में बाहर निकलना"
+    },
+    {
+      "en": "Test the air in order: oxygen, flammable gas, toxic gases",
+      "hi": "हवा की क्रम से जाँच: ऑक्सीजन, ज्वलनशील गैस, ज़हरीली गैसें"
+    },
+    {
+      "en": "Ventilate, sign the permit, choose PPE and post an attendant",
+      "hi": "वेंटिलेशन, परमिट पर हस्ताक्षर, सही PPE और अटेंडेंट की तैनाती"
+    },
+    {
+      "en": "Rescue from outside, never by going in unprotected",
+      "hi": "बाहर से बचाव करना, कभी बिना सुरक्षा के अंदर नहीं जाना"
+    }
+  ],
+  "estimatedMinutes": 8,
+  "criticalErrors": [
+    {
+      "id": "ignition-source",
+      "title": {
+        "en": "Operated a switch in the gas",
+        "hi": "गैस में बिजली का स्विच चलाया"
+      },
+      "explanation": {
+        "en": "Switching anything on or off can make a spark, and one spark can set off flammable gas. In a gas area leave switches, lights, motors and phones alone: get everyone out upwind and raise the alarm from a safe place.",
+        "hi": "कोई भी चीज़ चालू या बंद करने से चिंगारी निकल सकती है, और एक चिंगारी ज्वलनशील गैस में धमाका कर सकती है। गैस वाली जगह में स्विच, लाइट, मोटर और फ़ोन को हाथ न लगाएँ: सबको हवा आने की दिशा में बाहर निकालें और सुरक्षित जगह से अलार्म दें।"
+      },
+      "notes": "Standard gas-leak response: remove ignition sources and do not operate electrical switches, on or off, in a flammable atmosphere (oil-company / OISD LPG safety advice; Factories Act 1948 s.36A on lamps and electrical appliances where flammable gas may be present)."
+    },
+    {
+      "id": "no-attendant",
+      "title": {
+        "en": "Entry with no attendant outside",
+        "hi": "बाहर अटेंडेंट के बिना प्रवेश"
+      },
+      "explanation": {
+        "en": "Someone must stay at the entrance the whole time, in contact with the worker inside, ready to raise the alarm and pull them out on the lifeline. With nobody outside, nobody knows when something goes wrong, and help comes too late.",
+        "hi": "प्रवेश द्वार पर पूरे समय कोई न कोई रहना चाहिए, जो अंदर वाले से संपर्क में रहे और ज़रूरत पड़ने पर अलार्म देकर लाइफ़लाइन से उसे बाहर खींच सके। बाहर कोई न हो तो किसी को पता नहीं चलता कि कुछ गड़बड़ हुई है, और मदद बहुत देर से पहुँचती है।"
+      },
+      "notes": "OSHA 29 CFR 1910.146(i) attendant duties; Factories Act 1948 s.36(2)(b): the rope's free end is held by a person outside the confined space."
+    },
+    {
+      "id": "unprotected-rescue",
+      "title": {
+        "en": "Went in to rescue without breathing apparatus",
+        "hi": "बिना साँस के उपकरण के बचाने अंदर गए"
+      },
+      "explanation": {
+        "en": "Whatever made your co-worker collapse will make you collapse too. Most people who die in confined spaces are would-be rescuers. Raise the alarm and rescue from outside with the winch and lifeline. Only a trained rescue team with breathing apparatus may go in.",
+        "hi": "जिस वजह से आपका साथी गिरा, उसी से आप भी गिर जाएँगे। बंद जगहों में मरने वालों में ज़्यादातर वे लोग होते हैं जो बचाने के लिए अंदर गए। अलार्म दें और बाहर से विंच और लाइफ़लाइन से बचाव करें। सिर्फ़ साँस के उपकरण वाली प्रशिक्षित बचाव टीम ही अंदर जा सकती है।"
+      },
+      "notes": "NIOSH confined-space fatality studies (1986/1987): about 60% of the deaths were would-be rescuers. OSHA 29 CFR 1910.146(k): non-entry rescue with retrieval systems."
+    }
+  ],
+  "steps": [
+    {
+      "id": "identify-zones",
+      "title": {
+        "en": "Identify the hazard zones",
+        "hi": "खतरे के क्षेत्र पहचानना"
+      },
+      "interaction": "tap",
+      "points": 15,
+      "timeLimitSeconds": 45,
+      "group": "recognise",
+      "tone": "danger",
+      "headline": {
+        "en": "Gas leak!",
+        "hi": "गैस रिसाव!"
+      },
+      "instruction": {
+        "en": "LPG is hissing out of a pipe joint. It is heavier than air. Tap the three hazard areas: the red danger zone, the amber warning zone, and the low place where this gas collects.",
+        "hi": "पाइप के जोड़ से LPG सीटी की आवाज़ के साथ निकल रही है। यह हवा से भारी है। तीनों खतरे वाली जगहों पर टैप करें: लाल खतरा क्षेत्र, पीला चेतावनी क्षेत्र, और वह नीची जगह जहाँ यह गैस जमा होती है।"
+      },
+      "success": {
+        "en": "All three found. Heavy gas flows along the ground and fills pits and manholes, even outside the marked zones.",
+        "hi": "तीनों मिल गए। भारी गैस ज़मीन के साथ बहकर गड्ढों और मैनहोल में भर जाती है, निशान वाले क्षेत्रों के बाहर भी।"
+      },
+      "hint": {
+        "en": "LPG sinks. Look for a low place nearby, like the manhole, where it can flow in and collect.",
+        "hi": "LPG नीचे बैठती है। पास में कोई नीची जगह ढूँढें, जैसे मैनहोल, जहाँ यह बहकर जमा हो सकती है।"
+      },
+      "notes": "Red = flammable / immediately dangerous concentration near the source; amber = gas present, keep people out. Zone sizes are illustrative (on site they are set by gas measurement). LPG vapour is about 1.5 to 2 times heavier than air and collects in low points such as drains and pits (OISD-STD-144 and oil-company LPG safety guidance)."
+    },
+    {
+      "id": "stop-sparks",
+      "title": {
+        "en": "No sparks",
+        "hi": "कोई चिंगारी नहीं"
+      },
+      "interaction": "select-option",
+      "points": 10,
+      "timeLimitSeconds": 30,
+      "group": "alert",
+      "tone": "danger",
+      "headline": {
+        "en": "Ravi reaches for a switch",
+        "hi": "रवि स्विच की ओर हाथ बढ़ाता है"
+      },
+      "instruction": {
+        "en": "Ravi is at the pump panel inside the warning zone. He reaches for the switch to start the pit fan and blow the gas away. What do you tell him?",
+        "hi": "रवि चेतावनी क्षेत्र के अंदर पंप पैनल के पास है। वह गैस उड़ाने के लिए पिट का पंखा चालू करने को स्विच की ओर हाथ बढ़ाता है। आप उससे क्या कहेंगे?"
+      },
+      "success": {
+        "en": "Right. No switches, no sparks. You both head out of the gas area.",
+        "hi": "सही। न कोई स्विच, न कोई चिंगारी। आप दोनों गैस वाली जगह से बाहर निकलते हैं।"
+      },
+      "hint": {
+        "en": "Touch no switch in a gas area: switching anything on or off can make a spark.",
+        "hi": "गैस वाली जगह में कोई स्विच न छुएँ: कुछ भी चालू या बंद करने से चिंगारी निकल सकती है।"
+      },
+      "options": [
+        {
+          "id": "start-fan",
+          "label": {
+            "en": "Yes, start the fan to blow the gas away",
+            "hi": "हाँ, गैस उड़ाने के लिए पंखा चालू करो"
+          },
+          "outcome": "critical",
+          "criticalErrorId": "ignition-source"
+        },
+        {
+          "id": "touch-nothing",
+          "label": {
+            "en": "Stop! Touch nothing. Come out of the gas with me",
+            "hi": "रुको! किसी चीज़ को हाथ मत लगाओ। मेरे साथ गैस से बाहर चलो"
+          },
+          "outcome": "correct"
+        },
+        {
+          "id": "switch-off",
+          "label": {
+            "en": "Switch the panel off first to make it safe",
+            "hi": "पहले पैनल बंद कर दो ताकि सुरक्षित हो जाए"
+          },
+          "outcome": "critical",
+          "criticalErrorId": "ignition-source"
+        }
+      ],
+      "notes": "Operating a switch, on or off, inside a flammable atmosphere is an ignition source. Power is isolated later, from outside the hazardous area, by an authorised electrician."
+    },
+    {
+      "id": "go-upwind",
+      "title": {
+        "en": "Get out upwind",
+        "hi": "हवा आने की दिशा में बाहर निकलना"
+      },
+      "interaction": "select-option",
+      "points": 10,
+      "timeLimitSeconds": 30,
+      "group": "alert",
+      "headline": {
+        "en": "Clear the area",
+        "hi": "जगह खाली करें"
+      },
+      "instruction": {
+        "en": "Take Ravi to a safe gathering point. Check the windsock and the drifting gas: which point is safe? Tap it.",
+        "hi": "रवि को इकट्ठा होने की किसी सुरक्षित जगह पर ले जाएँ। विंडसॉक और बहती गैस देखें: कौन-सी जगह सुरक्षित है? उस पर टैप करें।"
+      },
+      "success": {
+        "en": "Correct: Point 1 is upwind, so the wind carries the gas away from you.",
+        "hi": "सही: पॉइंट 1 हवा आने की दिशा में है, इसलिए हवा गैस को आपसे दूर ले जाती है।"
+      },
+      "hint": {
+        "en": "The windsock's tail points where the wind blows, and the gas goes the same way. Go the opposite way.",
+        "hi": "विंडसॉक की पूँछ उस ओर होती है जिधर हवा बह रही है, और गैस भी उधर ही जाती है। उसकी उलटी ओर जाएँ।"
+      },
+      "options": [
+        {
+          "id": "point-1",
+          "label": {
+            "en": "Gathering point 1",
+            "hi": "इकट्ठा होने की जगह 1"
+          },
+          "outcome": "correct"
+        },
+        {
+          "id": "point-2",
+          "label": {
+            "en": "Gathering point 2",
+            "hi": "इकट्ठा होने की जगह 2"
+          },
+          "outcome": "wrong",
+          "feedback": {
+            "en": "Point 2 is downwind: the wind blows the gas straight towards it. Go upwind, to Point 1.",
+            "hi": "पॉइंट 2 हवा की दिशा में आगे है: हवा गैस को सीधे उसी ओर ले जाती है। हवा आने की दिशा में, पॉइंट 1 पर जाएँ।"
+          }
+        }
+      ],
+      "notes": "Evacuate upwind (or crosswind, then upwind) of a gas release, never downwind. Standard emergency-response guidance."
+    },
+    {
+      "id": "call-control",
+      "title": {
+        "en": "Raise the alarm",
+        "hi": "अलार्म देना"
+      },
+      "interaction": "tap",
+      "points": 10,
+      "timeLimitSeconds": 20,
+      "group": "alert",
+      "headline": {
+        "en": "Raise the alarm",
+        "hi": "अलार्म दें"
+      },
+      "instruction": {
+        "en": "You are upwind and out of the gas. Now report it: tap the phone to call the control room so they can shut off the gas line.",
+        "hi": "आप हवा आने की दिशा में और गैस से बाहर हैं। अब सूचना दें: कंट्रोल रूम को फ़ोन करने के लिए फ़ोन पर टैप करें, ताकि वे गैस लाइन बंद कर सकें।"
+      },
+      "success": {
+        "en": "Control room informed. They are shutting off the line, and nobody goes near the leak meanwhile.",
+        "hi": "कंट्रोल रूम को सूचना मिल गई। वे लाइन बंद कर रहे हैं, और तब तक कोई रिसाव के पास नहीं जाएगा।"
+      },
+      "hint": {
+        "en": "Call from here, outside the gas: phones and radios can spark.",
+        "hi": "यहीं से, गैस के बाहर से फ़ोन करें: फ़ोन और रेडियो से चिंगारी निकल सकती है।"
+      },
+      "notes": "Report from a safe place outside the gas cloud; ordinary phones and radios are potential ignition sources. Only trained people isolate the supply."
+    },
+    {
+      "id": "test-oxygen",
+      "title": {
+        "en": "Test oxygen first",
+        "hi": "पहले ऑक्सीजन की जाँच"
+      },
+      "interaction": "aim",
+      "points": 10,
+      "timeLimitSeconds": 45,
+      "group": "test",
+      "badge": "1",
+      "headline": {
+        "en": "Test before entry",
+        "hi": "प्रवेश से पहले जाँच"
+      },
+      "instruction": {
+        "en": "The leak has stopped, but the faulty valve is down in the pit and gas has collected there. Before anyone goes in, test the air from outside: choose the first test on the gas monitor, then point the probe into the manhole and hold it there.",
+        "hi": "रिसाव रुक गया है, पर खराब वाल्व पिट के अंदर है और वहाँ गैस जमा हो गई है। किसी के अंदर जाने से पहले बाहर से हवा की जाँच करें: गैस मॉनिटर पर पहली जाँच चुनें, फिर प्रोब को मैनहोल के अंदर की ओर करें और वहीं रोके रखें।"
+      },
+      "fallbackInstruction": {
+        "en": "The leak has stopped, but the faulty valve is down in the pit and gas has collected there. Before anyone goes in, test the air from outside: choose the first test on the gas monitor, then drag the view (or turn on Gyro) until the crosshair is on the manhole, and hold it there.",
+        "hi": "रिसाव रुक गया है, पर खराब वाल्व पिट के अंदर है और वहाँ गैस जमा हो गई है। किसी के अंदर जाने से पहले बाहर से हवा की जाँच करें: गैस मॉनिटर पर पहली जाँच चुनें, फिर दृश्य खींचकर (या जाइरो चालू करके) निशान को मैनहोल पर लाएँ और वहीं रोके रखें।"
+      },
+      "success": {
+        "en": "Oxygen 17.8%: too low. Safe is 19.5 to 23.5%. Rust, rotting sludge and gas use up or push out the air.",
+        "hi": "ऑक्सीजन 17.8%: बहुत कम। सुरक्षित सीमा 19.5 से 23.5% है। जंग, सड़ती गाद और गैस हवा को खत्म कर देते हैं या बाहर धकेल देते हैं।"
+      },
+      "hint": {
+        "en": "Oxygen comes first: too little oxygen kills without warning, and the flammable-gas reading is only right when there is enough oxygen. Then flammable gas, then toxic gases.",
+        "hi": "पहले ऑक्सीजन: ऑक्सीजन कम हो तो बिना चेतावनी के जान जा सकती है, और ज्वलनशील गैस की रीडिंग भी तभी सही आती है जब ऑक्सीजन पूरी हो। फिर ज्वलनशील गैस, फिर ज़हरीली गैसें।"
+      },
+      "messages": {
+        "choose-test": {
+          "en": "First choose a test on the gas monitor.",
+          "hi": "पहले गैस मॉनिटर पर एक जाँच चुनें।"
+        }
+      },
+      "notes": "Test order per OSHA 29 CFR 1910.146(c)(5)(ii)(C): oxygen, then flammable gases and vapours, then toxic air contaminants. Acceptable oxygen 19.5 to 23.5%. The pit readings are illustrative values set by the app team; choosing a later test first counts as a mistake."
+    },
+    {
+      "id": "test-flammable",
+      "title": {
+        "en": "Test flammable gas",
+        "hi": "ज्वलनशील गैस की जाँच"
+      },
+      "interaction": "aim",
+      "points": 10,
+      "timeLimitSeconds": 45,
+      "group": "test",
+      "badge": "2",
+      "headline": {
+        "en": "Next test",
+        "hi": "अगली जाँच"
+      },
+      "instruction": {
+        "en": "Oxygen is too low. Choose the next test on the gas monitor and sample the pit again.",
+        "hi": "ऑक्सीजन बहुत कम है। गैस मॉनिटर पर अगली जाँच चुनें और पिट की हवा फिर से जाँचें।"
+      },
+      "fallbackInstruction": {
+        "en": "Oxygen is too low. Choose the next test on the gas monitor, then put the crosshair on the manhole and hold it there.",
+        "hi": "ऑक्सीजन बहुत कम है। गैस मॉनिटर पर अगली जाँच चुनें, फिर निशान को मैनहोल पर लाएँ और वहीं रोके रखें।"
+      },
+      "success": {
+        "en": "Flammable gas 32% LEL: too high. It must be below 10% LEL. One spark down there could cause an explosion.",
+        "hi": "ज्वलनशील गैस 32% LEL: बहुत ज़्यादा। यह 10% LEL से कम होनी चाहिए। वहाँ एक चिंगारी से धमाका हो सकता है।"
+      },
+      "hint": {
+        "en": "After oxygen comes flammable gas (% LEL). Toxic gases are tested last.",
+        "hi": "ऑक्सीजन के बाद ज्वलनशील गैस (% LEL) की जाँच होती है। ज़हरीली गैसें सबसे आखिर में।"
+      },
+      "messages": {
+        "choose-test": {
+          "en": "First choose a test on the gas monitor.",
+          "hi": "पहले गैस मॉनिटर पर एक जाँच चुनें।"
+        }
+      },
+      "notes": "LEL = lower explosive limit. Entry requires flammable gas below 10% LEL (OSHA 1910.146 definition of a hazardous atmosphere)."
+    },
+    {
+      "id": "test-toxic",
+      "title": {
+        "en": "Test toxic gases",
+        "hi": "ज़हरीली गैसों की जाँच"
+      },
+      "interaction": "aim",
+      "points": 10,
+      "timeLimitSeconds": 45,
+      "group": "test",
+      "badge": "3",
+      "headline": {
+        "en": "Last test",
+        "hi": "आखिरी जाँच"
+      },
+      "instruction": {
+        "en": "Flammable gas is too high. Now the last test: choose it on the gas monitor and sample the pit.",
+        "hi": "ज्वलनशील गैस बहुत ज़्यादा है। अब आखिरी जाँच: इसे गैस मॉनिटर पर चुनें और पिट की हवा जाँचें।"
+      },
+      "fallbackInstruction": {
+        "en": "Flammable gas is too high. Now the last test: choose it on the gas monitor, then put the crosshair on the manhole and hold it there.",
+        "hi": "ज्वलनशील गैस बहुत ज़्यादा है। अब आखिरी जाँच: इसे गैस मॉनिटर पर चुनें, फिर निशान को मैनहोल पर लाएँ और वहीं रोके रखें।"
+      },
+      "success": {
+        "en": "H₂S 18 ppm: too high (limit 10 ppm), from rotting sludge. CO 4 ppm: OK (limit 25 ppm). Nobody may go in yet.",
+        "hi": "H₂S 18 ppm: बहुत ज़्यादा (सीमा 10 ppm), सड़ती गाद से। CO 4 ppm: ठीक (सीमा 25 ppm)। अभी कोई अंदर नहीं जा सकता।"
+      },
+      "hint": {
+        "en": "Toxic gases such as hydrogen sulphide (H₂S) and carbon monoxide (CO) are tested last.",
+        "hi": "हाइड्रोजन सल्फ़ाइड (H₂S) और कार्बन मोनोऑक्साइड (CO) जैसी ज़हरीली गैसों की जाँच सबसे आखिर में होती है।"
+      },
+      "messages": {
+        "choose-test": {
+          "en": "First choose a test on the gas monitor.",
+          "hi": "पहले गैस मॉनिटर पर एक जाँच चुनें।"
+        }
+      },
+      "notes": "Alarm limits used: H₂S 10 ppm (NIOSH REL ceiling), CO 25 ppm (ACGIH TLV-TWA). These are common 4-gas monitor settings; the site permit's limits take precedence."
+    },
+    {
+      "id": "ventilate",
+      "title": {
+        "en": "Ventilate the pit",
+        "hi": "पिट में ताज़ी हवा भेजना"
+      },
+      "interaction": "drag-drop",
+      "points": 10,
+      "timeLimitSeconds": 40,
+      "group": "permit",
+      "headline": {
+        "en": "Ventilate",
+        "hi": "वेंटिलेशन"
+      },
+      "instruction": {
+        "en": "The air is not safe. Force fresh air into the pit: drag the blower's air hose into the manhole. The blower stands upwind, in clean air.",
+        "hi": "हवा सुरक्षित नहीं है। पिट में ताज़ी हवा भेजें: ब्लोअर की हवा वाली नली को खींचकर मैनहोल में डालें। ब्लोअर हवा आने की दिशा में, साफ़ हवा में रखा है।"
+      },
+      "success": {
+        "en": "Ventilation running. Fresh air is pushing the gas out of the pit.",
+        "hi": "वेंटिलेशन चालू है। ताज़ी हवा गैस को पिट से बाहर धकेल रही है।"
+      },
+      "hint": {
+        "en": "Drag the end of the hose and drop it into the manhole opening.",
+        "hi": "नली का सिरा खींचें और उसे मैनहोल के मुँह में छोड़ें।"
+      },
+      "messages": {
+        "missed": {
+          "en": "Put the hose right into the manhole, so the fresh air reaches the bottom of the pit.",
+          "hi": "नली को ठीक मैनहोल के अंदर डालें, ताकि ताज़ी हवा पिट की तली तक पहुँचे।"
+        }
+      },
+      "notes": "Continuous forced-air ventilation from a clean-air source, placed so it does not draw in gas or engine exhaust (OSHA 1910.146 Appendix E; standard confined-space practice). Equipment near a possible flammable atmosphere must be suitable for it (for example air-driven or flameproof)."
+    },
+    {
+      "id": "sign-permit",
+      "title": {
+        "en": "Re-test and sign the permit",
+        "hi": "दोबारा जाँच और परमिट पर हस्ताक्षर"
+      },
+      "interaction": "tap",
+      "points": 15,
+      "group": "permit",
+      "headline": {
+        "en": "Entry permit",
+        "hi": "प्रवेश परमिट"
+      },
+      "instruction": {
+        "en": "Keep testing while the blower runs: point the probe into the manhole and watch the readings. Sign the entry permit only when every reading is safe.",
+        "hi": "ब्लोअर चलते समय जाँच जारी रखें: प्रोब को मैनहोल के अंदर की ओर करें और रीडिंग देखें। प्रवेश परमिट पर हस्ताक्षर तभी करें जब हर रीडिंग सुरक्षित हो।"
+      },
+      "fallbackInstruction": {
+        "en": "Keep testing while the blower runs: put the crosshair on the manhole and watch the readings. Sign the entry permit only when every reading is safe.",
+        "hi": "ब्लोअर चलते समय जाँच जारी रखें: निशान को मैनहोल पर रखें और रीडिंग देखें। प्रवेश परमिट पर हस्ताक्षर तभी करें जब हर रीडिंग सुरक्षित हो।"
+      },
+      "success": {
+        "en": "Permit signed: line shut off, air tested safe, ventilation running. Keep the blower on and keep testing during the work.",
+        "hi": "परमिट पर हस्ताक्षर हो गए: लाइन बंद, हवा जाँची और सुरक्षित, वेंटिलेशन चालू। काम के दौरान ब्लोअर चलता रहे और जाँच जारी रहे।"
+      },
+      "hint": {
+        "en": "Not yet: the air in the pit is still unsafe. Keep the blower running and keep testing until every reading is in the safe range.",
+        "hi": "अभी नहीं: पिट की हवा अभी भी सुरक्षित नहीं है। ब्लोअर चलने दें और जाँच तब तक जारी रखें जब तक हर रीडिंग सुरक्षित सीमा में न आ जाए।"
+      },
+      "messages": {
+        "test-first": {
+          "en": "Test first: point the probe into the manhole and check every reading before you sign.",
+          "hi": "पहले जाँच करें: हस्ताक्षर से पहले प्रोब को मैनहोल के अंदर की ओर करके हर रीडिंग देखें।"
+        }
+      },
+      "notes": "Factories Act 1948 s.36(2)(a): a written certificate by a competent person, based on a test, that the space is reasonably free from dangerous gas. OSHA 1910.146(f) entry permit. Re-test after ventilating and monitor continuously during the entry. Signing before the pit reads safe counts as a mistake."
+    },
+    {
+      "id": "dress-entrant",
+      "title": {
+        "en": "Choose the entry PPE",
+        "hi": "प्रवेश के लिए PPE चुनना"
+      },
+      "interaction": "drag-drop",
+      "points": 20,
+      "timeLimitSeconds": 90,
+      "group": "ppe",
+      "headline": {
+        "en": "Equip the entrant",
+        "hi": "अंदर जाने वाले को तैयार करें"
+      },
+      "instruction": {
+        "en": "Ravi will go down to fix the valve. Drag the equipment he needs from the tray onto him, then tap Ready.",
+        "hi": "रवि वाल्व ठीक करने नीचे जाएगा। उसे जिन उपकरणों की ज़रूरत है, उन्हें ट्रे से खींचकर उस पर डालें, फिर 'तैयार' पर टैप करें।"
+      },
+      "success": {
+        "en": "Ravi is ready: helmet, breathing apparatus, harness with lifeline and his own gas detector.",
+        "hi": "रवि तैयार है: हेलमेट, साँस का उपकरण, लाइफ़लाइन वाला हार्नेस और उसका अपना गैस डिटेक्टर।"
+      },
+      "hint": {
+        "en": "He needs head protection, his own air supply, a way to be pulled out, and a gas alarm that goes with him.",
+        "hi": "उसे सिर की सुरक्षा, अपनी हवा की सप्लाई, बाहर खींचे जाने का साधन, और अपने साथ रहने वाला गैस अलार्म चाहिए।"
+      },
+      "options": [
+        {
+          "id": "helmet",
+          "label": {
+            "en": "Safety helmet",
+            "hi": "सेफ़्टी हेलमेट"
+          },
+          "outcome": "correct"
+        },
+        {
+          "id": "dust-mask",
+          "label": {
+            "en": "Dust mask",
+            "hi": "डस्ट मास्क"
+          },
+          "outcome": "wrong",
+          "feedback": {
+            "en": "A dust mask only filters dust. It gives no oxygen and does not stop gas.",
+            "hi": "डस्ट मास्क सिर्फ़ धूल रोकता है। यह न ऑक्सीजन देता है, न गैस रोकता है।"
+          }
+        },
+        {
+          "id": "breathing-apparatus",
+          "label": {
+            "en": "Breathing apparatus",
+            "hi": "साँस का उपकरण"
+          },
+          "outcome": "correct"
+        },
+        {
+          "id": "gas-detector",
+          "label": {
+            "en": "Personal gas detector",
+            "hi": "निजी गैस डिटेक्टर"
+          },
+          "outcome": "correct"
+        },
+        {
+          "id": "torch",
+          "label": {
+            "en": "Ordinary torch",
+            "hi": "साधारण टॉर्च"
+          },
+          "outcome": "wrong",
+          "feedback": {
+            "en": "An ordinary torch can spark. Where flammable gas may be present, only flameproof lamps are allowed.",
+            "hi": "साधारण टॉर्च से चिंगारी निकल सकती है। जहाँ ज्वलनशील गैस हो सकती है, वहाँ सिर्फ़ फ़्लेमप्रूफ़ लैंप की अनुमति है।"
+          }
+        },
+        {
+          "id": "harness",
+          "label": {
+            "en": "Harness with lifeline",
+            "hi": "लाइफ़लाइन वाला हार्नेस"
+          },
+          "outcome": "correct"
+        }
+      ],
+      "messages": {
+        "missing": {
+          "en": "Ravi is not ready. Missing: {{items}}.",
+          "hi": "रवि अभी तैयार नहीं है। कमी है: {{items}}।"
+        }
+      },
+      "notes": "Brief: helmet, breathing apparatus / respirator as appropriate, harness with lifeline, personal gas detector. Factories Act 1948 s.36(2)(b) (breathing apparatus and a belt attached to a rope held outside) and s.36A(b) (only flameproof lamps where flammable gas is likely); OSHA 1910.146(k)(3) retrieval systems. Filter masks give no protection in oxygen-deficient air. Each wrong item and each Ready with items missing counts as a mistake."
+    },
+    {
+      "id": "assign-attendant",
+      "title": {
+        "en": "Post an attendant",
+        "hi": "अटेंडेंट तैनात करना"
+      },
+      "interaction": "select-option",
+      "points": 10,
+      "timeLimitSeconds": 30,
+      "group": "buddy",
+      "headline": {
+        "en": "Buddy system",
+        "hi": "बडी सिस्टम"
+      },
+      "instruction": {
+        "en": "Ravi is ready to go down, and Sunita is here too. Who stays where?",
+        "hi": "रवि नीचे जाने के लिए तैयार है, और सुनीता भी यहाँ है। कौन कहाँ रहेगा?"
+      },
+      "success": {
+        "en": "Right. Sunita is the attendant: she stays at the manhole, watches the monitor and never goes in.",
+        "hi": "सही। सुनीता अटेंडेंट है: वह मैनहोल पर रहेगी, मॉनिटर देखेगी और कभी अंदर नहीं जाएगी।"
+      },
+      "options": [
+        {
+          "id": "alone",
+          "label": {
+            "en": "Ravi goes in alone. It is a five-minute job",
+            "hi": "रवि अकेला जाए। पाँच मिनट का काम है"
+          },
+          "outcome": "critical",
+          "criticalErrorId": "no-attendant"
+        },
+        {
+          "id": "sunita-outside",
+          "label": {
+            "en": "Sunita stays at the manhole as attendant the whole time",
+            "hi": "सुनीता पूरे समय मैनहोल पर अटेंडेंट बनकर रहे"
+          },
+          "outcome": "correct"
+        },
+        {
+          "id": "both-inside",
+          "label": {
+            "en": "Sunita goes down with Ravi to help. Nobody stays at the top",
+            "hi": "सुनीता भी मदद के लिए रवि के साथ नीचे जाए। ऊपर कोई न रहे"
+          },
+          "outcome": "critical",
+          "criticalErrorId": "no-attendant"
+        }
+      ],
+      "notes": "OSHA 1910.146(i): the attendant stays outside for the whole entry, keeps contact with the entrant, summons rescue and never enters."
+    },
+    {
+      "id": "comms-check",
+      "title": {
+        "en": "Communication check",
+        "hi": "संपर्क की जाँच"
+      },
+      "interaction": "hold",
+      "points": 10,
+      "timeLimitSeconds": 20,
+      "group": "buddy",
+      "headline": {
+        "en": "Check you can talk",
+        "hi": "बात हो सकती है, जाँचें"
+      },
+      "instruction": {
+        "en": "Before Ravi goes down, check the radio works: press and hold Talk.",
+        "hi": "रवि के नीचे जाने से पहले जाँचें कि रेडियो काम करता है: 'बोलें' बटन दबाए रखें।"
+      },
+      "success": {
+        "en": "Ravi: \"Loud and clear.\" Sunita will keep checking on him while he works, and his lifeline stays clipped to the winch.",
+        "hi": "रवि: \"साफ़ सुनाई दे रहा है।\" काम के दौरान सुनीता उससे बात करती रहेगी, और उसकी लाइफ़लाइन विंच से जुड़ी रहेगी।"
+      },
+      "hint": {
+        "en": "Keep holding Talk until Ravi answers.",
+        "hi": "रवि के जवाब देने तक 'बोलें' दबाए रखें।"
+      },
+      "notes": "Agree on how the attendant and entrant communicate (radio, voice, rope signals) and test it before entry (OSHA 1910.146(i) attendant duties). Radios used in confined spaces must be intrinsically safe."
+    },
+    {
+      "id": "emergency-response",
+      "title": {
+        "en": "Respond to a collapse",
+        "hi": "बेहोश होने पर कार्रवाई"
+      },
+      "interaction": "select-option",
+      "points": 15,
+      "timeLimitSeconds": 25,
+      "group": "emergency",
+      "tone": "danger",
+      "headline": {
+        "en": "Man down!",
+        "hi": "आदमी गिर गया!"
+      },
+      "instruction": {
+        "en": "Ten minutes later Ravi stops answering. His gas detector is alarming and he is lying still at the bottom of the pit. What do you do?",
+        "hi": "दस मिनट बाद रवि जवाब देना बंद कर देता है। उसका गैस डिटेक्टर बज रहा है और वह पिट की तली में बिना हिले पड़ा है। आप क्या करेंगे?"
+      },
+      "success": {
+        "en": "Right. The alarm is raised and the rescue team is on its way. Now pull Ravi out from the top.",
+        "hi": "सही। अलार्म दे दिया गया है और बचाव टीम आ रही है। अब रवि को ऊपर से बाहर खींचें।"
+      },
+      "options": [
+        {
+          "id": "climb-in",
+          "label": {
+            "en": "Climb down at once to help him",
+            "hi": "तुरंत नीचे उतरकर उसकी मदद करूँ"
+          },
+          "outcome": "critical",
+          "criticalErrorId": "unprotected-rescue"
+        },
+        {
+          "id": "alarm-winch",
+          "label": {
+            "en": "Raise the alarm and pull him out with the winch",
+            "hi": "अलार्म दूँ और विंच से उसे बाहर खींचूँ"
+          },
+          "outcome": "correct"
+        },
+        {
+          "id": "send-sunita",
+          "label": {
+            "en": "Send Sunita down wearing a dust mask",
+            "hi": "सुनीता को डस्ट मास्क पहनाकर नीचे भेजूँ"
+          },
+          "outcome": "critical",
+          "criticalErrorId": "unprotected-rescue"
+        },
+        {
+          "id": "wait",
+          "label": {
+            "en": "Wait a minute to see if he gets up",
+            "hi": "एक मिनट रुककर देखूँ कि वह उठता है या नहीं"
+          },
+          "outcome": "wrong",
+          "feedback": {
+            "en": "Every second counts. Raise the alarm and start the rescue from outside now.",
+            "hi": "हर सेकंड कीमती है। अभी अलार्म दें और बाहर से बचाव शुरू करें।"
+          }
+        }
+      ],
+      "notes": "Non-entry rescue first (OSHA 1910.146(k)(3)); entry rescue only by a trained team wearing breathing apparatus. A dust mask gives no protection against gas or low oxygen."
+    },
+    {
+      "id": "winch-rescue",
+      "title": {
+        "en": "Winch him out",
+        "hi": "विंच से बाहर निकालना"
+      },
+      "interaction": "hold",
+      "points": 10,
+      "group": "emergency",
+      "headline": {
+        "en": "Rescue from outside",
+        "hi": "बाहर से बचाव"
+      },
+      "instruction": {
+        "en": "Press and hold Winch to pull Ravi up on his lifeline. Stay outside the pit.",
+        "hi": "लाइफ़लाइन से रवि को ऊपर खींचने के लिए 'विंच' दबाए रखें। पिट के बाहर ही रहें।"
+      },
+      "success": {
+        "en": "Ravi is out. Move him into fresh air, check his breathing and hand over to the rescue team.",
+        "hi": "रवि बाहर आ गया। उसे ताज़ी हवा में ले जाएँ, उसकी साँस जाँचें और बचाव टीम को सौंपें।"
+      },
+      "hint": {
+        "en": "Keep holding Winch until Ravi is out of the manhole.",
+        "hi": "रवि के मैनहोल से बाहर आने तक 'विंच' दबाए रखें।"
+      },
+      "notes": "A mechanical retrieval device (tripod and winch) is required for vertical entries deeper than 1.5 m (OSHA 1910.146(k)(3)(ii))."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "test-order",
+      "prompt": {
+        "en": "Before anyone enters a confined space, in what order do you test the air?",
+        "hi": "किसी के बंद जगह में जाने से पहले हवा की जाँच किस क्रम में करते हैं?"
+      },
+      "illustration": "test-order",
+      "options": [
+        {
+          "id": "oxygen-first",
+          "label": {
+            "en": "Oxygen, then flammable gas, then toxic gases",
+            "hi": "ऑक्सीजन, फिर ज्वलनशील गैस, फिर ज़हरीली गैसें"
+          },
+          "correct": true
+        },
+        {
+          "id": "toxic-first",
+          "label": {
+            "en": "Toxic gases, then flammable gas, then oxygen",
+            "hi": "ज़हरीली गैसें, फिर ज्वलनशील गैस, फिर ऑक्सीजन"
+          },
+          "correct": false
+        },
+        {
+          "id": "smell",
+          "label": {
+            "en": "Only flammable gas, if you can smell something",
+            "hi": "सिर्फ़ ज्वलनशील गैस, अगर कुछ गंध आए तो"
+          },
+          "correct": false
+        }
+      ],
+      "explanation": {
+        "en": "Oxygen first, because too little oxygen kills fast and upsets the flammable-gas reading. Then flammable gas, then toxic gases. Never trust your nose.",
+        "hi": "पहले ऑक्सीजन, क्योंकि कम ऑक्सीजन जल्दी जान ले लेती है और ज्वलनशील गैस की रीडिंग भी गलत कर देती है। फिर ज्वलनशील गैस, फिर ज़हरीली गैसें। अपनी नाक पर कभी भरोसा न करें।"
+      },
+      "notes": "OSHA 29 CFR 1910.146(c)(5)(ii)(C)."
+    },
+    {
+      "id": "heavy-gas",
+      "prompt": {
+        "en": "LPG is leaking near a drain. Where is the gas most likely to collect?",
+        "hi": "एक नाली के पास LPG रिस रही है। गैस सबसे ज़्यादा कहाँ जमा होगी?"
+      },
+      "illustration": "heavy-gas",
+      "options": [
+        {
+          "id": "roof",
+          "label": {
+            "en": "Up near the roof",
+            "hi": "ऊपर छत के पास"
+          },
+          "correct": false
+        },
+        {
+          "id": "low",
+          "label": {
+            "en": "In drains, pits and manholes",
+            "hi": "नालियों, गड्ढों और मैनहोल में"
+          },
+          "correct": true
+        },
+        {
+          "id": "gone",
+          "label": {
+            "en": "Nowhere: it blows away at once",
+            "hi": "कहीं नहीं: यह तुरंत उड़ जाती है"
+          },
+          "correct": false
+        }
+      ],
+      "explanation": {
+        "en": "LPG is heavier than air. It flows along the ground and fills low places, where it can stay for a long time.",
+        "hi": "LPG हवा से भारी होती है। यह ज़मीन के साथ बहकर नीची जगहों में भर जाती है और वहाँ लंबे समय तक रह सकती है।"
+      }
+    },
+    {
+      "id": "no-switch",
+      "prompt": {
+        "en": "You smell gas in the pump room and the lights are off. What do you do?",
+        "hi": "आपको पंप रूम में गैस की गंध आती है और लाइटें बंद हैं। आप क्या करेंगे?"
+      },
+      "illustration": "no-switch",
+      "options": [
+        {
+          "id": "lights",
+          "label": {
+            "en": "Switch on the lights to find the leak",
+            "hi": "रिसाव ढूँढने के लिए लाइट चालू करूँ"
+          },
+          "correct": false
+        },
+        {
+          "id": "fan",
+          "label": {
+            "en": "Start the exhaust fan",
+            "hi": "एग्ज़ॉस्ट फ़ैन चालू करूँ"
+          },
+          "correct": false
+        },
+        {
+          "id": "leave",
+          "label": {
+            "en": "Leave every switch alone and get out upwind",
+            "hi": "किसी स्विच को हाथ न लगाऊँ और हवा आने की दिशा में बाहर निकलूँ"
+          },
+          "correct": true
+        }
+      ],
+      "explanation": {
+        "en": "A switch can spark and ignite the gas. Touch nothing electrical, get out upwind and raise the alarm from a safe place.",
+        "hi": "स्विच से चिंगारी निकलकर गैस में आग लग सकती है। बिजली की किसी चीज़ को हाथ न लगाएँ, हवा आने की दिशा में बाहर निकलें और सुरक्षित जगह से अलार्म दें।"
+      }
+    },
+    {
+      "id": "attendant-duty",
+      "prompt": {
+        "en": "What does the attendant do while a worker is inside a confined space?",
+        "hi": "जब कोई कर्मचारी बंद जगह के अंदर हो, तब अटेंडेंट क्या करता है?"
+      },
+      "illustration": "attendant",
+      "options": [
+        {
+          "id": "help",
+          "label": {
+            "en": "Goes in to help when the work is slow",
+            "hi": "काम धीमा हो तो मदद के लिए अंदर जाता है"
+          },
+          "correct": false
+        },
+        {
+          "id": "stay",
+          "label": {
+            "en": "Stays at the entrance, keeps in contact and calls rescue if needed",
+            "hi": "प्रवेश द्वार पर रहता है, संपर्क में रहता है और ज़रूरत हो तो बचाव बुलाता है"
+          },
+          "correct": true
+        },
+        {
+          "id": "tools",
+          "label": {
+            "en": "Goes to the store to fetch tools",
+            "hi": "औज़ार लाने स्टोर जाता है"
+          },
+          "correct": false
+        }
+      ],
+      "explanation": {
+        "en": "The attendant never leaves and never goes in. They watch, keep talking with the worker and start the rescue from outside.",
+        "hi": "अटेंडेंट न कभी जगह छोड़ता है, न कभी अंदर जाता है। वह नज़र रखता है, अंदर वाले से बात करता रहता है और बाहर से बचाव शुरू करता है।"
+      },
+      "notes": "OSHA 29 CFR 1910.146(i)."
+    },
+    {
+      "id": "rescue-from-outside",
+      "prompt": {
+        "en": "A worker collapses inside a pit. Which rescue is right?",
+        "hi": "एक कर्मचारी पिट के अंदर बेहोश होकर गिर जाता है। कौन-सा बचाव सही है?"
+      },
+      "illustration": "rescue",
+      "options": [
+        {
+          "id": "breath",
+          "label": {
+            "en": "Hold your breath and go in quickly",
+            "hi": "साँस रोककर जल्दी से अंदर जाना"
+          },
+          "correct": false
+        },
+        {
+          "id": "mask",
+          "label": {
+            "en": "Go in wearing a dust mask",
+            "hi": "डस्ट मास्क पहनकर अंदर जाना"
+          },
+          "correct": false
+        },
+        {
+          "id": "winch",
+          "label": {
+            "en": "Raise the alarm and pull them out with the winch and lifeline",
+            "hi": "अलार्म देकर विंच और लाइफ़लाइन से उसे बाहर खींचना"
+          },
+          "correct": true
+        }
+      ],
+      "explanation": {
+        "en": "Most people who die in confined spaces are would-be rescuers. Rescue from outside; only a trained team with breathing apparatus may go in.",
+        "hi": "बंद जगहों में मरने वालों में ज़्यादातर वे लोग होते हैं जो बचाने के लिए अंदर गए। बाहर से बचाव करें; सिर्फ़ साँस के उपकरण वाली प्रशिक्षित टीम ही अंदर जा सकती है।"
+      }
+    }
+  ],
+  "review": {
+    "source": "OSHA 29 CFR 1910.146 (permit-required confined spaces: test order, permits, attendants, rescue); Factories Act 1948 s.36 and s.36A (India: dangerous gases in confined spaces, flameproof lamps); NIOSH confined-space guidance; OISD-STD-144 and oil-company LPG safety guidance (gas leak response).",
+    "notes": "Needs review by a certified confined-space / gas-safety trainer before use: the alarm limits (O₂ 19.5 to 23.5%, flammable below 10% LEL, H₂S below 10 ppm, CO below 25 ppm) against the site's permit system, whether full breathing apparatus or an escape set is required after the pit tests safe, the illustrative pit readings and hazard-zone sizes, and the Hindi wording. Santali is not translated yet and falls back to Hindi. Time limits (timeLimitSeconds) are training targets set by the app team, not from a standard; taking longer costs 20% of that step's points.",
+    "reviewedBy": null,
+    "reviewedAt": null
+  }
+}

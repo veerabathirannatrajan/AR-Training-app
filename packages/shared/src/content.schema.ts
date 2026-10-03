@@ -59,6 +59,7 @@ export const moduleStepSchema = z.object({
   success: localizedTextSchema,
   hint: localizedTextSchema.optional(),
   options: z.array(stepOptionSchema).min(2).optional(),
+  messages: z.record(kebab, localizedTextSchema).optional(),
   notes: nonEmpty.optional(),
 });
 

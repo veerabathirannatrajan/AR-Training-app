@@ -48,7 +48,8 @@ export default defineConfig({
         lang: 'en-IN',
         start_url: '/',
         scope: '/',
-        display: 'standalone',
+        // Full screen like a native app (the Android app hides the status and navigation bars too).
+        display: 'fullscreen',
         orientation: 'portrait',
         background_color: '#11151c',
         theme_color: '#11151c',

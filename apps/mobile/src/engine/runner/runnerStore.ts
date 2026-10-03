@@ -94,8 +94,8 @@ interface RunnerState {
   acknowledgeCritical: () => void;
   /** Applies a choice on a decision step according to its content (correct / acceptable / wrong / critical). */
   chooseOption: (stepId: string, optionId: string) => void;
-  /** Shows (and speaks) the step's hint without counting a mistake. */
-  showHint: (stepId: string) => void;
+  /** Shows (and speaks) the step's hint, or the given message, without counting a mistake. */
+  showHint: (stepId: string, message?: LocalizedText) => void;
   setFact: (key: string, value: string) => void;
   setStepProgress: (progress: number) => void;
   /** Restarts the current step's clock (e.g. once the AR area has been placed). */
@@ -459,16 +459,17 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
       }
     },
 
-    showHint(stepId) {
+    showHint(stepId, message) {
       const step = currentStep(stepId);
-      if (step?.hint == null) return;
+      const text = message ?? step?.hint;
+      if (step == null || text == null) return;
       const { module } = get();
       set({
         feedback: {
           id: ++feedbackId,
           tone: 'hint',
-          text: step.hint,
-          narrationId: `${module?.id}.${step.id}.hint`,
+          text,
+          narrationId: `${module?.id}.${step.id}.${message == null ? 'hint' : 'message'}`,
         },
       });
     },
@@ -557,6 +558,27 @@ export function useStepCurrent(stepId: string): boolean {
 /** True once `stepId` has been completed (or skipped in retraining) in this attempt. */
 export function useStepCompleted(stepId: string): boolean {
   return useRunnerStore((state) => state.outcomes.some((outcome) => outcome.stepId === stepId));
+}
+
+type RunnerSnapshot = ReturnType<typeof useRunnerStore.getState>;
+
+/**
+ * True once the attempt has moved past `stepId`: it was completed, or skipped in retraining
+ * and comes before the step being played. Unlike `useStepCompleted`, steps skipped later in
+ * the module are not past yet, so a scene shows the story as it stands at the current step.
+ */
+export function stepPassed(state: RunnerSnapshot, stepId: string): boolean {
+  const index = state.module?.steps.findIndex((step) => step.id === stepId) ?? -1;
+  if (index < 0 || state.status === 'idle') return false;
+  if (state.status !== 'running' || index < state.stepIndex) return true;
+  return (
+    index === state.stepIndex &&
+    state.outcomes.some((outcome) => outcome.stepId === stepId && outcome.skipped !== true)
+  );
+}
+
+export function useStepPassed(stepId: string): boolean {
+  return useRunnerStore((state) => stepPassed(state, stepId));
 }
 
 /** A decision recorded during the attempt (see `facts`). */

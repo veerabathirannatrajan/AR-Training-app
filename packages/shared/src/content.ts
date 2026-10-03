@@ -70,6 +70,11 @@ export interface ModuleStep {
   hint?: LocalizedText;
   /** Answer choices for decision steps. */
   options?: StepOption[];
+  /**
+   * Extra feedback the module scene shows in specific situations, keyed by situation id
+   * (e.g. "missing"). `{{name}}` placeholders are filled in by the scene (see fillText).
+   */
+  messages?: Record<string, LocalizedText>;
   notes?: string;
 }
 
@@ -134,6 +139,33 @@ export function resolveText(text: LocalizedText, lang: LanguageCode): ResolvedTe
     return { text: text.hi, lang: 'hi', needsReview: false };
   }
   return { text: text[lang], lang, needsReview: false };
+}
+
+/** Fills `{{name}}` placeholders in every language of a text with the matching values. */
+export function fillText(
+  template: LocalizedText,
+  values: Readonly<Record<string, LocalizedText>>,
+): LocalizedText {
+  const fill = (text: string, pick: (value: LocalizedText) => string) =>
+    text.replace(/\{\{(\w+)\}\}/g, (match, name: string) => {
+      const value = values[name];
+      return value == null ? match : pick(value);
+    });
+  const filled: LocalizedText = {
+    en: fill(template.en, (value) => value.en),
+    hi: fill(template.hi, (value) => value.hi),
+  };
+  if (template.sat != null) {
+    // Values without Santali fall back to Hindi, so the result is a draft until reviewed.
+    filled.sat = {
+      text: fill(template.sat.text, (value) => value.sat?.text ?? value.hi),
+      needsReview:
+        template.sat.needsReview ||
+        Object.values(values).some((value) => value.sat == null || value.sat.needsReview),
+      source: template.sat.source,
+    };
+  }
+  return filled;
 }
 
 export function totalPoints(module: TrainingModuleContent): number {

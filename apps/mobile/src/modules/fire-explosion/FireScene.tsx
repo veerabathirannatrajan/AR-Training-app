@@ -21,6 +21,7 @@ import {
   useStepCompleted,
   useStepCurrent,
 } from '../../engine/runner/runnerStore';
+import { usePlacementClock } from '../../engine/runner/usePlacementClock';
 import { WorldLabel } from '../../engine/WorldLabel';
 import { useLocalized } from '../../i18n/localized';
 import {
@@ -81,18 +82,6 @@ function useOptionLabel(stepId: string, optionId: string): string {
     .find((step) => step.id === stepId)
     ?.options?.find((candidate) => candidate.id === optionId);
   return option != null ? localize(option.label).text : optionId;
-}
-
-/** In AR the first step's clock starts once the area is placed, not while searching the floor. */
-function usePlacementClock() {
-  const placed = useEngineStore((state) => state.placement === 'placed');
-  const started = useRef(false);
-  useEffect(() => {
-    if (placed && !started.current) {
-      started.current = true;
-      runner().restartStepTimer();
-    }
-  }, [placed]);
 }
 
 export function FireScene() {

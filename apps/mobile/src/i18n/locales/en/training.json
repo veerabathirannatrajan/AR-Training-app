@@ -46,7 +46,9 @@
     "gyro": "Gyro",
     "gyroUnavailable": "No gyroscope on this phone",
     "squeeze": "Squeeze",
-    "move": "Move"
+    "move": "Move",
+    "talk": "Talk",
+    "winch": "Winch"
   },
   "crouch": {
     "standUp": "Stand up straight",

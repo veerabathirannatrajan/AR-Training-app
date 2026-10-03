@@ -123,6 +123,40 @@ function sirenLoop(): Loop | null {
   };
 }
 
+/** Personal gas detector alarm: fast piercing double beeps until stopped. */
+function beepLoop(): Loop | null {
+  if (audio() == null) return null;
+  const beep = () => {
+    tone(3100, 0.07, 'square', 0.06);
+    tone(3100, 0.07, 'square', 0.06, 0.12);
+  };
+  beep();
+  const timer = window.setInterval(beep, 480);
+  return { stop: () => window.clearInterval(timer) };
+}
+
+/** Radio squelch: a short burst of band-limited static and a click. */
+function radioBurst() {
+  const a = audio();
+  if (a == null) return;
+  const { ctx, out } = a;
+  const source = ctx.createBufferSource();
+  source.buffer = noise(ctx);
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.value = 1800;
+  filter.Q.value = 0.8;
+  const gain = ctx.createGain();
+  const start = ctx.currentTime;
+  gain.gain.setValueAtTime(0.0001, start);
+  gain.gain.exponentialRampToValueAtTime(0.09, start + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.28);
+  source.connect(filter).connect(gain).connect(out);
+  source.start(start);
+  source.stop(start + 0.3);
+  tone(1250, 0.03, 'square', 0.05, 0.3);
+}
+
 export const sfx = {
   tap: () => tone(880, 0.06, 'triangle', 0.08),
   success: () => {
@@ -161,6 +195,12 @@ export const sfx = {
   fire: () => noiseLoop('lowpass', 900, 0.18, true),
   hiss: () => noiseLoop('highpass', 2500, 0.16, false),
   siren: () => sirenLoop(),
+  /** Ventilation blower hum. */
+  fan: () => noiseLoop('lowpass', 320, 0.12, false),
+  gasAlarm: () => beepLoop(),
+  radio: () => radioBurst(),
+  /** One click of a winch ratchet. */
+  ratchet: () => tone(820 + Math.random() * 160, 0.025, 'square', 0.05),
 };
 
 /** Short vibration patterns (Android Chrome supports navigator.vibrate). */

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { crouchDepth, crouchThreshold, nextCrouchState } from './crouch';
+import { FALLBACK_FOV, fallbackFov, MIN_HORIZONTAL_FOV } from './fallback/view';
+import { HIP_HEIGHT, legAngles, RIG } from './primitives/avatar/rig';
 import {
   angleDelta,
   dragRotateDelta,
@@ -61,5 +63,52 @@ describe('crouch detection', () => {
     expect(crouchDepth(1.4, 1.4)).toBe(0);
     expect(crouchDepth(1.225, 1.4)).toBeCloseTo(0.5);
     expect(crouchDepth(0.6, 1.4)).toBe(1);
+  });
+});
+
+describe('3D mode field of view', () => {
+  const horizontal = (vertical: number, aspect: number) =>
+    (Math.atan(Math.tan((vertical * Math.PI) / 360) * aspect) * 360) / Math.PI;
+
+  it('keeps the standard view on landscape screens', () => {
+    expect(fallbackFov(16 / 9)).toBe(FALLBACK_FOV);
+  });
+
+  it('widens on portrait screens so the sides of the area stay in view', () => {
+    const aspect = 412 / 760;
+    expect(fallbackFov(aspect)).toBeGreaterThan(FALLBACK_FOV);
+    expect(horizontal(fallbackFov(aspect), aspect)).toBeCloseTo(MIN_HORIZONTAL_FOV, 5);
+  });
+});
+
+describe('avatar leg IK', () => {
+  /** Where the ankle ends up for the given angles (forward, down from the hip). */
+  function ankleOf(hip: number, knee: number) {
+    const thigh = -hip;
+    const shin = thigh - knee;
+    return {
+      forward: RIG.thigh * Math.sin(thigh) + RIG.shin * Math.sin(shin),
+      down: RIG.thigh * Math.cos(thigh) + RIG.shin * Math.cos(shin),
+    };
+  }
+
+  it('stands with straight legs and level feet', () => {
+    const leg = legAngles(0, HIP_HEIGHT - RIG.ankle);
+    expect(leg.hip).toBeCloseTo(0, 1);
+    expect(leg.knee).toBeCloseTo(0, 1);
+    expect(leg.hip + leg.knee + leg.ankle).toBeCloseTo(0, 6);
+  });
+
+  it.each([
+    [0, 0.45],
+    [0.2, 0.75],
+    [-0.15, 0.6],
+  ])('puts the ankle on the target (%s m forward, %s m down)', (forward, down) => {
+    const leg = legAngles(forward, down);
+    const ankle = ankleOf(leg.hip, leg.knee);
+    expect(ankle.forward).toBeCloseTo(forward, 4);
+    expect(ankle.down).toBeCloseTo(down, 4);
+    // Knees bend forward, like a person's.
+    expect(leg.knee).toBeGreaterThanOrEqual(0);
   });
 });

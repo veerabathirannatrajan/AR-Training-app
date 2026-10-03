@@ -24,6 +24,9 @@ log = logging.getLogger("uvicorn.error")
 DEV_ORIGINS = [
     f"http://{host}:{port}" for host in ("localhost", "127.0.0.1") for port in (5173, 5174, 4173)
 ]
+# The Android app (TWA) loads the deployed web app from Vercel and, during development, reaches
+# this API on the laptop as http://localhost:8000 through `adb reverse`.
+DEPLOYED_ORIGIN_REGEX = r"https://ar-mining-training(-[a-z0-9-]+)?\.vercel\.app"
 
 
 @asynccontextmanager
@@ -41,7 +44,10 @@ app = FastAPI(title="AR Mining Training API", version=__version__, lifespan=life
 app.add_middleware(
     CORSMiddleware,
     allow_origins=DEV_ORIGINS,
+    allow_origin_regex=DEPLOYED_ORIGIN_REGEX,
     allow_credentials=True,
+    # A public (https) page calling localhost: answer Chrome's Private Network Access preflight.
+    allow_private_network=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )

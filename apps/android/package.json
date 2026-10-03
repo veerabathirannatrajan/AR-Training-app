@@ -1,0 +1,10 @@
+{
+  "name": "@ar-training/android",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Android app (Trusted Web Activity) wrapping the deployed mobile web app",
+  "devDependencies": {
+    "@bubblewrap/core": "^1.25.0"
+  }
+}

@@ -3,20 +3,23 @@
 AR safety training for Jharkhand's mining, steel and mica workers (SIH 2026, PS SIH26041).
 See [PROJECT_BRIEF.md](PROJECT_BRIEF.md) for the full scope and phase plan.
 
-> Status: **Phase 2**. AR engine, app shell (installable, offline), AR Basics practice module,
-> and the assessed **Fire & Explosion Response** module with the assessment engine.
-> The full setup and demo guide comes in Phase 7.
+> Status: **Phase 3**. AR engine, app shell (installable, offline), AR Basics practice module,
+> the assessment engine and two assessed modules: **Fire & Explosion Response** and
+> **Gas Leak & Confined Space**. The full setup and demo guide comes in Phase 7.
 
 ## Training modules
 
-| Module                    | Kind     | What the worker does                                                                                                                                                |
-| ------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AR Basics                 | Practice | Place and turn the area, tap, drag, aim, press-and-hold, crouch                                                                                                     |
-| Fire & Explosion Response | Assessed | Raise the alarm, identify an electrical fire, pick the extinguisher, PASS (pull, aim, squeeze, sweep), stay low under smoke, evacuate past a blocked exit, stay out |
+| Module                    | Kind     | What the worker does                                                                                                                                                                                                                                                             |
+| ------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AR Basics                 | Practice | Place and turn the area, tap, drag, aim, press-and-hold, crouch                                                                                                                                                                                                                  |
+| Fire & Explosion Response | Assessed | Raise the alarm, identify an electrical fire, pick the extinguisher, PASS (pull, aim, squeeze, sweep), stay low under smoke, evacuate past a blocked exit, stay out                                                                                                              |
+| Gas Leak & Confined Space | Assessed | Mark the hazard zones and the manhole where LPG collects, stop a spark, get out upwind (windsock), call it in; then test the pit (O₂ → LEL → H₂S/CO), ventilate, re-test and sign the permit, dress the entrant, post an attendant, radio check, non-entry rescue with the winch |
 
 **Assessment:** 60% practical (correct actions, order, time) + 40% scenario quiz (5 illustrated,
-narrated questions). Pass mark 70%. Any critical error (water on an electrical fire, a blocked
-exit or the lift, going back inside) fails the attempt, with an explanation. After a failure the
+narrated questions). Pass mark 70%. Any critical error fails the attempt, with an explanation:
+water on an electrical fire, a blocked exit or the lift, going back inside (Fire); operating a
+switch in the gas, entry with no attendant outside, going in to rescue without breathing
+apparatus (Gas). After a failure the
 worker can practise only the steps they missed; after a pass, refresher drills are scheduled for
 1, 3 and 7 days and offered on the home screen. All safety text lives in
 `packages/shared/content/modules/*.json` with source notes for expert review.
@@ -32,7 +35,8 @@ worker can practise only the steps they missed; after a pass, refresher drills a
 | `services/api`            | FastAPI service (Python, `.venv` inside)                                 |
 | `packages/shared`         | Shared TypeScript types, content schemas, scoring types                  |
 | `packages/shared/content` | Module content JSON (reviewable; every module has `review.source/notes`) |
-| `scripts`                 | Dev helpers: phone/adb, API venv and runner, translation export          |
+| `apps/android`            | Android app (TWA) config; `npm run android` generates and builds it      |
+| `scripts`                 | Dev helpers: phone/adb, Android build, API venv and runner, translations |
 
 ## Prerequisites
 
@@ -89,8 +93,35 @@ the browser bar. After the first login it works without the laptop and without i
 the app shell, fonts, content and narration are all precached, and workers who have logged in
 on that phone can log in again offline with their PIN.
 
-A signed APK (Trusted Web Activity via Bubblewrap) comes in Phase 7; it needs the app hosted
-on an HTTPS domain.
+## Android app (APK) on the phone
+
+A real installable Android app: **AR Mining Training** in the app drawer, opening full screen
+with no browser bar. It is a Trusted Web Activity generated with Bubblewrap from
+`apps/android/twa-manifest.json`: a small signed APK that runs the deployed web app
+(https://ar-mining-training.vercel.app) in Chrome's engine, so WebXR AR works exactly as in
+Chrome. Chrome hides its address bar because the site's `/.well-known/assetlinks.json` names the
+APK's signing key.
+
+```sh
+npm run dev:api     # the first login on a phone needs the API (reached through adb reverse)
+npm run android     # build web app → deploy to Vercel → build + sign APK → adb install → launch
+```
+
+- `npm run android -- --no-deploy` rebuilds and reinstalls the APK only;
+  `-- --no-install` only builds `apps/android/dist/ar-mining-training.apk`.
+- First run: `npx vercel login` if asked; the script creates the signing key in
+  `apps/android/keys/` (gitignored). **Back that folder up**: updates must be signed with the
+  same key, and a new key means changing `assetlinks.json` and reinstalling.
+- Needs Android Studio's bundled JDK (or JDK 17–23 via `ARMT_JDK`) and the Android SDK.
+- The app loads the live site, so after a deploy it offers the update on the next launch without
+  reinstalling. After the first login it works offline, like the installed web app.
+- Screen: the app shell is portrait; each module sets its orientation in
+  `apps/mobile/src/modules/registry.ts` (AR Basics rotates freely, the assessed modules stay
+  portrait).
+- API: the app calls `http://localhost:8000` on the phone, which `adb reverse` forwards to the
+  laptop (the API allows the Vercel origin and Chrome's private-network preflight). If Chrome
+  asks to allow access to devices on the local network, tap **Allow**. A hosted API (Phase 6)
+  removes the need for the cable.
 
 ## Languages
 
@@ -105,18 +136,19 @@ English, हिन्दी and ᱥᱟᱱᱛᱟᱲᱤ (Santali, Ol Chiki). Fonts
 
 ## Scripts
 
-| Script                  | Does                                               |
-| ----------------------- | -------------------------------------------------- |
-| `npm run dev`           | Mobile dev server (hot reload, no service worker)  |
-| `npm run dev:api`       | FastAPI with auto-reload                           |
-| `npm run setup:api`     | Create `services/api/.venv` and install deps       |
-| `npm run phone`         | Check adb/device, reverse ports, open the dev app  |
-| `npm run phone:reverse` | Same, without opening Chrome                       |
-| `npm run app`           | Build and serve the installable app on :4173       |
-| `npm run phone:app`     | Point the phone at the installable app             |
-| `npm run i18n:export`   | Export all strings to `translations/strings.csv`   |
-| `npm test`              | Unit tests (mobile, shared) and API tests (pytest) |
-| `npm run typecheck`     | Strict TypeScript across workspaces                |
-| `npm run lint`          | ESLint                                             |
-| `npm run format`        | Prettier                                           |
-| `npm run build`         | Typecheck and production build of all workspaces   |
+| Script                  | Does                                                  |
+| ----------------------- | ----------------------------------------------------- |
+| `npm run dev`           | Mobile dev server (hot reload, no service worker)     |
+| `npm run dev:api`       | FastAPI with auto-reload                              |
+| `npm run setup:api`     | Create `services/api/.venv` and install deps          |
+| `npm run phone`         | Check adb/device, reverse ports, open the dev app     |
+| `npm run phone:reverse` | Same, without opening Chrome                          |
+| `npm run app`           | Build and serve the installable app on :4173          |
+| `npm run phone:app`     | Point the phone at the installable app                |
+| `npm run android`       | Deploy, build the signed APK, install it on the phone |
+| `npm run i18n:export`   | Export all strings to `translations/strings.csv`      |
+| `npm test`              | Unit tests (mobile, shared) and API tests (pytest)    |
+| `npm run typecheck`     | Strict TypeScript across workspaces                   |
+| `npm run lint`          | ESLint                                                |
+| `npm run format`        | Prettier                                              |
+| `npm run build`         | Typecheck and production build of all workspaces      |

@@ -1,0 +1,59 @@
+{
+  "labels": {
+    "leak": "Leak",
+    "dangerZone": "Danger zone",
+    "noEntry": "No entry",
+    "warningZone": "Warning zone",
+    "keepOut": "Keep everyone out",
+    "manhole": "Manhole",
+    "gasCollects": "Heavy gas collects here",
+    "fanSwitch": "Pit fan switch",
+    "pointOne": "Point 1",
+    "pointTwo": "Point 2",
+    "downwind": "Downwind",
+    "windsock": "Windsock",
+    "phone": "Control room phone",
+    "tapToCall": "Tap to call",
+    "airHose": "Air hose",
+    "dragToManhole": "Drag it into the manhole",
+    "probeHere": "Point the probe here",
+    "ravi": "Ravi",
+    "sunita": "Sunita",
+    "entrant": "Entrant",
+    "attendant": "Attendant",
+    "staysOutside": "Stays outside",
+    "dragHere": "Drag equipment onto Ravi",
+    "loudAndClear": "Loud and clear!",
+    "noAnswer": "Not answering!"
+  },
+  "monitor": {
+    "title": "Gas monitor",
+    "sampling": "Sampling the pit",
+    "notInPit": "Probe not in the pit",
+    "chooseTest": "Choose a test",
+    "tapToTest": "Tap to test",
+    "oxygen": "Oxygen",
+    "flammable": "Flammable gas",
+    "toxic": "Toxic gas",
+    "ok": "OK",
+    "low": "Low",
+    "high": "High",
+    "safeOxygen": "Safe {{min}}–{{max}} %",
+    "safeFlammable": "Safe below {{max}} % LEL",
+    "safeToxic": "Safe: H₂S below {{h2s}}, CO below {{co}} ppm",
+    "sign": "Sign entry permit",
+    "notTested": "Not tested"
+  },
+  "ppe": {
+    "title": "Entry equipment",
+    "hint": "Drag onto Ravi, or tap twice",
+    "tapAgain": "Tap again to put on",
+    "onRavi": "On Ravi",
+    "needed": "Needed",
+    "ready": "Ready"
+  },
+  "overlay": {
+    "blower": "Blower on · fresh air into the pit",
+    "alarm": "Gas alarm · Ravi is not answering"
+  }
+}

@@ -3,6 +3,7 @@ import { XR } from '@react-three/xr';
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { installBackGuard, useCurrentRoute, type Route } from './app/navigation';
+import { useOrientationLock, type OrientationNeed } from './app/orientation';
 import { TrainingWorld } from './engine/TrainingWorld';
 import { useRunnerStore } from './engine/runner/runnerStore';
 import { useBlockXRSelectOnUI } from './engine/xr/xrUi';
@@ -72,10 +73,17 @@ function Stage({ route }: { route: Route }) {
   );
 }
 
+/** App screens are portrait; a module chooses its orientation from the device check on. */
+function orientationFor(route: Route): OrientationNeed {
+  if (route.name !== 'device-check' && route.name !== 'training') return 'portrait';
+  return findModule(route.moduleId)?.orientation ?? 'portrait';
+}
+
 export function App() {
   const route = useCurrentRoute();
   const xrSession = useXRSession();
 
+  useOrientationLock(orientationFor(route));
   useBlockXRSelectOnUI(overlayRoot);
   useEffect(() => installBackGuard(), []);
   useEffect(() => {

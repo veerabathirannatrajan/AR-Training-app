@@ -1,0 +1,32 @@
+{
+  "packageId": "com.armining.training",
+  "host": "ar-mining-training.vercel.app",
+  "name": "AR Mining Training",
+  "launcherName": "AR Mining Training",
+  "display": "fullscreen-sticky",
+  "orientation": "default",
+  "themeColor": "#11151C",
+  "themeColorDark": "#11151C",
+  "navigationColor": "#11151C",
+  "navigationColorDark": "#11151C",
+  "navigationDividerColor": "#11151C",
+  "navigationDividerColorDark": "#11151C",
+  "backgroundColor": "#11151C",
+  "enableNotifications": false,
+  "startUrl": "/",
+  "iconUrl": "https://ar-mining-training.vercel.app/pwa-512x512.png",
+  "maskableIconUrl": "https://ar-mining-training.vercel.app/maskable-icon-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "keys/release.keystore",
+    "alias": "armt"
+  },
+  "appVersionCode": 1,
+  "appVersion": "1.0.0",
+  "shortcuts": [],
+  "generatorApp": "@bubblewrap/core",
+  "fallbackType": "customtabs",
+  "enableSiteSettingsShortcut": true,
+  "minSdkVersion": 24,
+  "fingerprints": []
+}

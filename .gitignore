@@ -31,6 +31,14 @@ desktop.ini
 # Signing keys (never commit)
 *.pem
 *.key
+*.keystore
+*.jks
 services/api/keys/
+apps/android/keys/
+
+# Generated: Android project (from apps/android/twa-manifest.json), Vercel build output
+apps/android/twa/
+.vercel/
+
 .pytest_cache/
 translations/

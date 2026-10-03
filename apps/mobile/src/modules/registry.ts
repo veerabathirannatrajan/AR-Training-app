@@ -1,11 +1,21 @@
-import { AR_BASICS, FIRE_EXPLOSION, type TrainingModuleContent } from '@ar-training/shared';
-import { Flame, Hand, type LucideIcon } from 'lucide-react';
+import {
+  AR_BASICS,
+  FIRE_EXPLOSION,
+  GAS_CONFINED_SPACE,
+  type TrainingModuleContent,
+} from '@ar-training/shared';
+import { Flame, Hand, Wind, type LucideIcon } from 'lucide-react';
 import type { ComponentType } from 'react';
+import type { OrientationNeed } from '../app/orientation';
 import type { FallbackView } from '../engine/fallback/view';
+import type { HoldLabel } from '../engine/hud/controls';
 import { ArBasicsScene } from './ar-basics/ArBasicsScene';
 import { FireOverlay, FireTray } from './fire-explosion/FireHud';
 import { FireScene } from './fire-explosion/FireScene';
 import { FIRE_ILLUSTRATIONS } from './fire-explosion/illustrationMap';
+import { GasOverlay, GasTray } from './gas-confined-space/GasHud';
+import { GasScene } from './gas-confined-space/GasScene';
+import { GAS_ILLUSTRATIONS } from './gas-confined-space/illustrationMap';
 
 /** HUD controls a step needs besides the instruction card. */
 export interface StepUi {
@@ -13,7 +23,7 @@ export interface StepUi {
   crosshair?: boolean;
   /** Large press-and-hold button. */
   hold?: boolean;
-  holdLabel?: 'hold' | 'squeeze';
+  holdLabel?: HoldLabel;
   /** Crouch meter (AR) / Crouch button (3D mode). */
   crouch?: boolean;
   /** Press-and-hold Move button (walking along a route). */
@@ -47,6 +57,8 @@ export interface ModuleDefinition {
   illustrations?: Readonly<Record<string, ComponentType>>;
   /** 3D-mode starting camera, framing the module's training area. */
   fallbackView?: FallbackView;
+  /** Screen orientation while training (locked in the installed app). Defaults to portrait. */
+  orientation?: OrientationNeed;
 }
 
 export const MODULES: readonly ModuleDefinition[] = [
@@ -55,6 +67,8 @@ export const MODULES: readonly ModuleDefinition[] = [
     Scene: ArBasicsScene,
     icon: Hand,
     accent: '#2f80ed',
+    // Simple one-control steps: works held either way.
+    orientation: 'any',
     stepUi: {
       rotate: { progress: true },
       'aim-target': { crosshair: true, progress: true },
@@ -69,6 +83,8 @@ export const MODULES: readonly ModuleDefinition[] = [
     Overlay: FireOverlay,
     icon: Flame,
     accent: '#e8590c',
+    // HUD (instruction card, P-A-S-S dots, extinguisher tray) is laid out for portrait.
+    orientation: 'portrait',
     stepUi: {
       'choose-extinguisher': { options: 'scene', moduleTray: true },
       'pass-aim': { crosshair: true, progress: true },
@@ -86,6 +102,30 @@ export const MODULES: readonly ModuleDefinition[] = [
       'choose-extinguisher': 'co2',
       'choose-exit': 'exit-b',
     },
+  },
+  {
+    content: GAS_CONFINED_SPACE,
+    Scene: GasScene,
+    Tray: GasTray,
+    Overlay: GasOverlay,
+    icon: Wind,
+    accent: '#0f8b8d',
+    // Gas-monitor and PPE trays are laid out for portrait.
+    orientation: 'portrait',
+    stepUi: {
+      'identify-zones': { progress: true },
+      'go-upwind': { options: 'scene' },
+      'test-oxygen': { crosshair: true, progress: true, moduleTray: true },
+      'test-flammable': { crosshair: true, progress: true, moduleTray: true },
+      'test-toxic': { crosshair: true, progress: true, moduleTray: true },
+      'sign-permit': { crosshair: true, moduleTray: true },
+      'dress-entrant': { options: 'scene', moduleTray: true },
+      'comms-check': { hold: true, holdLabel: 'talk', progress: true },
+      'winch-rescue': { hold: true, holdLabel: 'winch', progress: true },
+    },
+    illustrations: GAS_ILLUSTRATIONS,
+    // High enough to see both gathering points and the windsock on a portrait screen.
+    fallbackView: { position: [0.05, 3.3, 2.5], target: [0.05, 0.1, -0.45] },
   },
 ];
 

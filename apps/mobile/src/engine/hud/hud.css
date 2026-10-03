@@ -1127,3 +1127,378 @@
 .world-label-info strong {
   color: #ffd08a;
 }
+
+/* ---------- Gas monitor tray (Gas module) ---------- */
+
+.gas-monitor {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 10px;
+}
+
+.gas-monitor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.gas-monitor-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.gas-monitor-title svg {
+  color: var(--hud-amber);
+}
+
+.gas-monitor-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--hud-muted);
+}
+
+.gas-monitor-state i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.gas-monitor-state.is-sampling {
+  color: var(--hud-green);
+}
+
+.gas-monitor-state.is-sampling i {
+  background: var(--hud-green);
+  animation: pulse-dot 0.9s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  50% {
+    box-shadow: 0 0 0 5px rgba(52, 209, 122, 0.25);
+  }
+}
+
+.gas-cells {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.gas-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+  min-height: 96px;
+  padding: 8px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  background: #0d1218;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+button.gas-cell {
+  cursor: pointer;
+  transition:
+    transform 90ms ease,
+    border-color 120ms ease;
+}
+
+button.gas-cell:active {
+  transform: scale(0.97);
+}
+
+.gas-cell.is-live {
+  border-color: rgba(52, 209, 122, 0.7);
+}
+
+.gas-cell.is-live.status-low,
+.gas-cell.is-live.status-high {
+  border-color: rgba(255, 77, 77, 0.75);
+}
+
+.gas-cell.is-wrong {
+  border-color: rgba(255, 77, 77, 0.6);
+  background: rgba(120, 20, 20, 0.35);
+}
+
+.gas-cell-name {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--hud-muted);
+  line-height: 1.15;
+}
+
+.gas-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #b8f5d2;
+  font-family: ui-monospace, 'Roboto Mono', monospace;
+}
+
+.gas-value b {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.status-low .gas-value,
+.status-high .gas-value {
+  color: #ffb3b3;
+}
+
+.gas-value-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gas-value-pair b {
+  font-size: 17px;
+}
+
+.gas-value-idle {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  flex: 1;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--hud-amber);
+}
+
+.is-wrong .gas-value-idle {
+  color: var(--hud-red);
+}
+
+.gas-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.gas-status.is-ok {
+  background: rgba(52, 209, 122, 0.2);
+  color: var(--hud-green);
+}
+
+.gas-status.is-low,
+.gas-status.is-high {
+  background: rgba(255, 77, 77, 0.22);
+  color: var(--hud-red);
+}
+
+.gas-limit {
+  margin-top: auto;
+  font-size: 10px;
+  line-height: 1.2;
+  color: var(--hud-muted);
+}
+
+.gas-sign {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ff9448 0%, #e2640b 100%);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.35),
+    0 8px 18px rgba(226, 100, 11, 0.35);
+}
+
+.gas-sign:active {
+  transform: scale(0.98);
+}
+
+/* ---------- PPE tray (Gas module) ---------- */
+
+.ppe-tray {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 10px;
+}
+
+.ppe-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 4px;
+  font-size: 14px;
+}
+
+.ppe-head span {
+  font-size: 12px;
+  color: var(--hud-muted);
+}
+
+.ppe-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.ppe-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: 78px;
+  padding: 6px 4px;
+  border-radius: 16px;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.08);
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: grab;
+  transition:
+    transform 90ms ease,
+    border-color 120ms ease,
+    opacity 120ms ease;
+}
+
+.ppe-card:active {
+  transform: scale(0.96);
+}
+
+.ppe-card.is-selected {
+  border-color: var(--hud-green);
+  background: rgba(52, 209, 122, 0.16);
+}
+
+.ppe-card.is-dragging {
+  opacity: 0.35;
+}
+
+.ppe-card.is-worn {
+  opacity: 0.55;
+  border-color: rgba(52, 209, 122, 0.6);
+}
+
+.ppe-card.is-wrong {
+  opacity: 0.6;
+  border-color: rgba(255, 77, 77, 0.6);
+}
+
+.ppe-card.is-flagged {
+  border-color: var(--hud-amber);
+  animation: pulse-needed 0.9s ease-in-out infinite;
+}
+
+@keyframes pulse-needed {
+  50% {
+    box-shadow: 0 0 0 5px rgba(255, 176, 32, 0.25);
+  }
+}
+
+.ppe-card-label {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.ppe-needed,
+.ppe-tap-again {
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.ppe-needed {
+  color: var(--hud-amber);
+  text-transform: uppercase;
+}
+
+.ppe-tap-again {
+  color: var(--hud-green);
+}
+
+.ppe-ready {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 50px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #43e089 0%, #15924a 100%);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ppe-ready:disabled {
+  opacity: 0.5;
+}
+
+.ppe-ghost {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: rgba(14, 18, 26, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+.ppe-ghost.is-over {
+  /* Portalled outside .hud, so no HUD colour variables here. */
+  border-color: #34d17a;
+  background: rgba(21, 146, 74, 0.85);
+}
+
+/* ---------- Gas module status chips ---------- */
+
+.gas-chip {
+  background: rgba(10, 70, 72, 0.78);
+  border: 1px solid rgba(64, 210, 200, 0.5);
+  color: #c9fffa;
+}
+
+.gas-chip.is-danger {
+  background: rgba(150, 20, 20, 0.85);
+  border-color: rgba(255, 90, 90, 0.7);
+  color: #fff;
+  animation: pulse-danger 0.8s ease-in-out infinite;
+}

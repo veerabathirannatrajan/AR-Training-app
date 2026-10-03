@@ -8,10 +8,7 @@ import { angleDelta } from '../gestures';
 import { flatMaterial } from '../materials';
 import { PALETTE } from '../palette';
 import { deviceQuaternion, screenAngle } from './gyro';
-import { DEFAULT_FALLBACK_VIEW, type FallbackView } from './view';
-
-/** Wider than the AR camera: portrait phones otherwise see only a narrow slice of the scene. */
-const FALLBACK_FOV = 72;
+import { DEFAULT_FALLBACK_VIEW, fallbackFov, type FallbackView } from './view';
 
 const CROUCH_DROP = 0.65;
 /** In look mode the orbit centre sits this far in front of the eye, so dragging turns the view. */
@@ -36,6 +33,7 @@ const lookDirection = new Vector3();
 export function FallbackEnvironment({ view = DEFAULT_FALLBACK_VIEW }: { view?: FallbackView }) {
   // The camera is read through get() so effects and frames mutate it outside React's render data.
   const get = useThree((state) => state.get);
+  const aspect = useThree((state) => state.size.width / Math.max(1, state.size.height));
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const gyroEnabled = useEngineStore((state) => state.gyroEnabled);
   const aimActive = useEngineStore((state) => state.aimActive);
@@ -45,23 +43,24 @@ export function FallbackEnvironment({ view = DEFAULT_FALLBACK_VIEW }: { view?: F
   const gyroBase = useRef<{ inverseDevice: Quaternion; camera: Quaternion } | null>(null);
 
   useEffect(() => {
-    const camera = get().camera;
-    camera.position.set(...view.position);
-    if ('fov' in camera) {
-      const previousFov = camera.fov;
-      camera.fov = FALLBACK_FOV;
-      camera.updateProjectionMatrix();
-      controlsRef.current?.target.set(...view.target);
-      controlsRef.current?.update();
-      return () => {
-        camera.fov = previousFov;
-        camera.updateProjectionMatrix();
-      };
-    }
+    get().camera.position.set(...view.position);
     controlsRef.current?.target.set(...view.target);
     controlsRef.current?.update();
-    return undefined;
   }, [get, view]);
+
+  // Wider than the AR camera, and wider still on portrait screens, which otherwise see only a
+  // narrow slice of the training area.
+  useEffect(() => {
+    const camera = get().camera;
+    if (!('fov' in camera)) return undefined;
+    const previousFov = camera.fov;
+    camera.fov = fallbackFov(aspect);
+    camera.updateProjectionMatrix();
+    return () => {
+      camera.fov = previousFov;
+      camera.updateProjectionMatrix();
+    };
+  }, [get, aspect]);
 
   // Switch between orbiting the area and looking around from where the camera stands.
   // (Skipped on mount, where the orbit centre is the middle of the training area.)

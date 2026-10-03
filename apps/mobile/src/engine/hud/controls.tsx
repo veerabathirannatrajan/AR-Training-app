@@ -4,7 +4,7 @@ import {
   type ModuleStep,
   type TrainingModuleContent,
 } from '@ar-training/shared';
-import { ArrowDownToLine, Footprints, Hand } from 'lucide-react';
+import { ArrowDownToLine, Footprints, Hand, Radio, RotateCcw, type LucideIcon } from 'lucide-react';
 import { useEffect, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cx } from '../../design/cx';
@@ -87,14 +87,25 @@ function PressHoldButton({
   );
 }
 
-export function HoldButton({ label }: { label: 'hold' | 'squeeze' }) {
+/** What the Hold button says it does (and its icon). */
+export type HoldLabel = 'hold' | 'squeeze' | 'talk' | 'winch';
+
+const HOLD_ICONS: Record<HoldLabel, LucideIcon> = {
+  hold: Hand,
+  squeeze: Hand,
+  talk: Radio,
+  winch: RotateCcw,
+};
+
+export function HoldButton({ label }: { label: HoldLabel }) {
   const { t } = useTranslation('training');
   const pressed = useEngineStore((state) => state.holdPressed);
   const setHoldPressed = useEngineStore((state) => state.setHoldPressed);
+  const Icon = HOLD_ICONS[label];
   return (
     <PressHoldButton
-      label={t(label === 'squeeze' ? 'controls.squeeze' : 'controls.hold')}
-      icon={<Hand size={26} />}
+      label={t(`controls.${label}`)}
+      icon={<Icon size={26} />}
       variant="hold"
       pressed={pressed}
       onChange={setHoldPressed}
