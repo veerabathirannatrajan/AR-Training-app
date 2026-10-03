@@ -18,30 +18,30 @@
  * Env: ARMT_JDK=<JDK 17–23 home> (default: Android Studio's bundled JDK)
  *      ANDROID_HOME=<Android SDK>  ADB=<path to adb>  ANDROID_SERIAL=<device serial>
  */
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { randomBytes } from 'node:crypto';
-import {
-  cpSync,
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs';
 import { createRequire } from 'node:module';
-import { platform } from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { connectPhone, fail, isListening, reversePorts, sdkCandidates } from './lib/adb.mjs';
+import { connectPhone, fail, isListening, reversePorts } from './lib/adb.mjs';
+import {
+  ensureSigningKey,
+  exe,
+  exec,
+  findJdk,
+  findSdk,
+  gradle,
+  installApk,
+  KEYSTORE,
+  quiet,
+  ROOT,
+  signApk,
+  step,
+  versionCode,
+} from './lib/android-build.mjs';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MOBILE = path.join(ROOT, 'apps', 'mobile');
 const ANDROID = path.join(ROOT, 'apps', 'android');
 const TWA_MANIFEST = path.join(ANDROID, 'twa-manifest.json');
-const KEYS = path.join(ANDROID, 'keys');
-const KEYSTORE = path.join(KEYS, 'release.keystore');
-const SIGNING = path.join(KEYS, 'signing.json');
 const PROJECT = path.join(ANDROID, 'twa');
 const APK = path.join(ANDROID, 'dist', 'ar-mining-training.apk');
 const ASSET_LINKS = path.join(MOBILE, 'public', '.well-known', 'assetlinks.json');
@@ -51,139 +51,11 @@ const API_PORT = 8000;
 
 const deploy = !process.argv.includes('--no-deploy');
 const install = !process.argv.includes('--no-install');
-const isWindows = platform() === 'win32';
-const exe = (name) => (isWindows ? `${name}.exe` : name);
 
 // @bubblewrap/core is a dependency of the apps/android workspace.
 const bubblewrap = createRequire(path.join(ANDROID, 'package.json'))('@bubblewrap/core');
 
-function step(title) {
-  console.log(`\n▶ ${title}`);
-}
-
-/** Runs a command with live output; exits on failure. `shell` is needed for npm/npx on Windows. */
-function exec(
-  command,
-  args,
-  { cwd = ROOT, env = process.env, shell = false, capture = false } = {},
-) {
-  const result = shell
-    ? spawnSync([command, ...args].join(' '), {
-        cwd,
-        env,
-        shell: true,
-        stdio: capture ? ['inherit', 'pipe', 'inherit'] : 'inherit',
-        encoding: 'utf8',
-      })
-    : spawnSync(command, args, {
-        cwd,
-        env,
-        stdio: capture ? ['inherit', 'pipe', 'inherit'] : 'inherit',
-        encoding: 'utf8',
-      });
-  if (result.error) fail(`Could not run ${command}: ${result.error.message}`);
-  if (result.status !== 0)
-    fail(`\`${[command, ...args].join(' ')}\` failed (exit ${result.status}).`);
-  return result.stdout ?? '';
-}
-
-function quiet(command, args, options = {}) {
-  const result = spawnSync(command, args, { encoding: 'utf8', ...options });
-  return { ok: result.status === 0, output: `${result.stdout ?? ''}${result.stderr ?? ''}` };
-}
-
-// ---- Toolchain -------------------------------------------------------------------------------
-
-/** A JDK that can run the Gradle version in Bubblewrap's template (8.11: Java 17–23). */
-function findJdk() {
-  const candidates = [
-    process.env.ARMT_JDK,
-    isWindows && 'C:\\Program Files\\Android\\Android Studio\\jbr',
-    platform() === 'darwin' && '/Applications/Android Studio.app/Contents/jbr/Contents/Home',
-    '/opt/android-studio/jbr',
-    process.env.JAVA_HOME,
-  ].filter(Boolean);
-  for (const home of candidates) {
-    const java = path.join(home, 'bin', exe('java'));
-    if (!existsSync(java)) continue;
-    const { output } = quiet(java, ['-version']);
-    const major = Number(/version "(\d+)/.exec(output)?.[1]);
-    if (major >= 17 && major <= 23) return home;
-    console.log(`• Skipping JDK ${major} at ${home} (Gradle 8.11 needs 17–23)`);
-  }
-  fail('No suitable JDK (17–23) was found for the Android build.', [
-    'Install Android Studio (it bundles JDK 21), or install JDK 21 (e.g. Eclipse Temurin 21).',
-    'If it is somewhere else, set ARMT_JDK to its folder (the one containing bin/java).',
-  ]);
-}
-
-function findSdk() {
-  const home = sdkCandidates().find((dir) => existsSync(path.join(dir, 'build-tools')));
-  if (home == null) {
-    fail('The Android SDK was not found.', [
-      'Install Android Studio and open it once (it installs the SDK), or install the command-line tools.',
-      'Set ANDROID_HOME to the SDK folder if it is not in the default place.',
-    ]);
-  }
-  // Newest build-tools that has apksigner.
-  const buildTools = readdirSync(path.join(home, 'build-tools'))
-    .filter((version) =>
-      existsSync(path.join(home, 'build-tools', version, 'lib', 'apksigner.jar')),
-    )
-    .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))[0];
-  if (buildTools == null) {
-    fail('No Android build-tools found in the SDK.', [
-      'Android Studio > Settings > Android SDK > SDK Tools: install "Android SDK Build-Tools".',
-    ]);
-  }
-  return { home, buildTools: path.join(home, 'build-tools', buildTools) };
-}
-
 // ---- Signing key and Digital Asset Links ------------------------------------------------------
-
-function ensureSigningKey(jdk, alias) {
-  if (existsSync(KEYSTORE) && existsSync(SIGNING)) {
-    return JSON.parse(readFileSync(SIGNING, 'utf8'));
-  }
-  if (existsSync(KEYSTORE)) {
-    fail(`${KEYSTORE} exists but ${SIGNING} (its password) is missing.`, [
-      'Restore signing.json from your backup, or delete the keystore to create a new key (the installed app must then be uninstalled once).',
-    ]);
-  }
-  step('Creating the app signing key (first run)');
-  mkdirSync(KEYS, { recursive: true });
-  // PKCS12 keystores use one password for the store and the key.
-  const password = randomBytes(24).toString('base64url');
-  exec(
-    path.join(jdk, 'bin', exe('keytool')),
-    [
-      '-genkeypair',
-      '-keystore',
-      KEYSTORE,
-      '-storetype',
-      'PKCS12',
-      '-alias',
-      alias,
-      '-keyalg',
-      'RSA',
-      '-keysize',
-      '2048',
-      '-validity',
-      '10000',
-      '-storepass:env',
-      'ARMT_KEYSTORE_PASSWORD',
-      '-dname',
-      'CN=AR Mining Training, O=SIH 2026, C=IN',
-    ],
-    { env: { ...process.env, ARMT_KEYSTORE_PASSWORD: password } },
-  );
-  const signing = { alias, password };
-  writeFileSync(SIGNING, `${JSON.stringify(signing, null, 2)}\n`);
-  console.log(
-    `• Key saved in ${KEYS} (gitignored). Back this folder up: app updates must be signed with it.`,
-  );
-  return signing;
-}
 
 function signingFingerprint(jdk, signing) {
   const { output } = quiet(
@@ -322,11 +194,6 @@ async function checkAssetLinks(host, expected) {
 
 // ---- Android app ------------------------------------------------------------------------------
 
-/** Always increasing, so `adb install -r` accepts every new build (minutes since 2026-01-01). */
-function versionCode() {
-  return Math.floor((Date.now() - Date.UTC(2026, 0, 1)) / 60_000);
-}
-
 async function generateProject(manifest) {
   // Regenerate the sources from twa-manifest.json; keep Gradle's caches for speed.
   rmSync(path.join(PROJECT, 'app', 'src'), { recursive: true, force: true });
@@ -335,61 +202,20 @@ async function generateProject(manifest) {
 }
 
 function buildApk({ jdk, sdk, signing }) {
-  const env = {
-    ...process.env,
-    JAVA_HOME: jdk,
-    ANDROID_HOME: sdk.home,
-    ANDROID_SDK_ROOT: sdk.home,
-  };
-  // --no-daemon: don't leave a ~1 GB Gradle process running after the build.
-  // Absolute path: Windows may be set not to run programs from the current folder.
-  exec(
-    isWindows ? `"${path.join(PROJECT, 'gradlew.bat')}"` : path.join(PROJECT, 'gradlew'),
-    ['assembleRelease', '--no-daemon', '--console=plain', '--warning-mode=none'],
-    {
-      cwd: PROJECT,
-      env,
-      shell: isWindows,
-    },
-  );
+  gradle(PROJECT, 'assembleRelease', { jdk, sdk });
   const outputs = path.join(PROJECT, 'app', 'build', 'outputs', 'apk', 'release');
-  const unsigned = path.join(outputs, 'app-release-unsigned.apk');
-  const aligned = path.join(outputs, 'app-release-aligned.apk');
-  exec(path.join(sdk.buildTools, exe('zipalign')), ['-f', '-p', '4', unsigned, aligned]);
-  mkdirSync(path.dirname(APK), { recursive: true });
-  exec(
-    path.join(jdk, 'bin', exe('java')),
-    [
-      '-jar',
-      path.join(sdk.buildTools, 'lib', 'apksigner.jar'),
-      'sign',
-      '--ks',
-      KEYSTORE,
-      '--ks-key-alias',
-      signing.alias,
-      '--ks-pass',
-      'env:ARMT_KEYSTORE_PASSWORD',
-      '--key-pass',
-      'env:ARMT_KEYSTORE_PASSWORD',
-      '--out',
-      APK,
-      aligned,
-    ],
-    { env: { ...env, ARMT_KEYSTORE_PASSWORD: signing.password } },
-  );
+  signApk({
+    jdk,
+    sdk,
+    signing,
+    unsigned: path.join(outputs, 'app-release-unsigned.apk'),
+    out: APK,
+  });
 }
 
 function installOnPhone(packageId) {
   const { adb } = connectPhone('npm run android');
-  let result = adb(['install', '-r', APK]);
-  if (!result.ok && /INSTALL_FAILED_UPDATE_INCOMPATIBLE/.test(result.output)) {
-    // Installed copy was signed with a different key (e.g. a new keystore): replace it.
-    console.log('• Installed app has a different signing key; uninstalling it first');
-    adb(['uninstall', packageId]);
-    result = adb(['install', '-r', APK]);
-  }
-  if (!result.ok) fail('adb install failed.', [result.output]);
-  console.log(`• Installed ${path.relative(ROOT, APK)}`);
+  installApk(adb, APK, packageId);
   // The app's login API runs on this laptop; the phone reaches it as http://localhost:8000.
   reversePorts(adb, [API_PORT]);
   adb(['shell', 'am', 'force-stop', packageId]);

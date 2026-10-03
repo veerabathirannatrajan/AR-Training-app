@@ -27,3 +27,11 @@ def test_other_sites_are_not_allowed(client: TestClient) -> None:
         headers={**PREFLIGHT, "Origin": "https://ar-mining-training.vercel.app.example.com"},
     )
     assert "access-control-allow-origin" not in response.headers
+
+
+def test_portal_can_read_export_file_names(client: TestClient) -> None:
+    response = client.get(
+        "/api/certificates/keys", headers={"Origin": "http://localhost"}
+    )
+    assert response.headers["access-control-allow-origin"] == "http://localhost"
+    assert "content-disposition" in response.headers["access-control-expose-headers"].lower()

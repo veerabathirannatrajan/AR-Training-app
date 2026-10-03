@@ -66,6 +66,8 @@ app.add_middleware(
     allow_private_network=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    # Lets the portal read the export file name (CSV / PDF downloads).
+    expose_headers=["Content-Disposition"],
 )
 app.include_router(auth.router)
 app.include_router(sync.router)

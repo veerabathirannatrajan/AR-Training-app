@@ -3,9 +3,11 @@
 AR safety training for Jharkhand's mining, steel and mica workers (SIH 2026, PS SIH26041).
 See [PROJECT_BRIEF.md](PROJECT_BRIEF.md) for the full scope and phase plan.
 
-> Status: **Phase 3**. AR engine, app shell (installable, offline), AR Basics practice module,
-> the assessment engine and two assessed modules: **Fire & Explosion Response** and
-> **Gas Leak & Confined Space**. The full setup and demo guide comes in Phase 7.
+> Status: **Phase 5**. AR engine, app shell (installable, offline), AR Basics practice module,
+> the assessment engine, two assessed modules (**Fire & Explosion Response**, **Gas Leak &
+> Confined Space**), signed certificates with QR verification and a sync engine (Phase 4), and the
+> admin compliance portal, on the web and as its own Android app (Phase 5). The full setup and
+> demo guide comes in Phase 7.
 
 ## Training modules
 
@@ -31,7 +33,8 @@ worker can practise only the steps they missed; after a pass, refresher drills a
 | `apps/mobile`             | Worker app: React 18 + TS + Vite, React Three Fiber, `@react-three/xr`   |
 | `apps/mobile/src/engine`  | AR engine: placement, input, aiming, crouch tracking, 3D fallback, HUD   |
 | `apps/mobile/src/modules` | Module scenes (3D content + step logic), one folder per module           |
-| `apps/admin`              | Admin compliance portal (Phase 5)                                        |
+| `apps/admin`              | Admin portal: React + Vite + Tailwind (shadcn/ui), Recharts, Leaflet     |
+| `apps/admin/android`      | Admin Android app (Capacitor): the portal packaged in a native WebView   |
 | `services/api`            | FastAPI service (Python, `.venv` inside)                                 |
 | `packages/shared`         | Shared TypeScript types, content schemas, scoring types                  |
 | `packages/shared/content` | Module content JSON (reviewable; every module has `review.source/notes`) |
@@ -123,6 +126,68 @@ npm run android     # build web app → deploy to Vercel → build + sign APK �
   asks to allow access to devices on the local network, tap **Allow**. A hosted API (Phase 6)
   removes the need for the cable.
 
+## Certificates and verification (Phase 4)
+
+- **Issued offline, signed online.** Passing an assessment gives the worker a _provisional_
+  certificate on the phone straight away (id `P-XXXXXXXX`). When the phone syncs, the API
+  re-checks the result with the pass mark in force, assigns `CERT-0001`-style ids and signs it.
+- **Tamper-proof.** The certificate details are hashed (SHA-256 over canonical JSON) and the hash
+  is signed with the API's **Ed25519** key (`services/api/keys/cert_signing_ed25519.key`, created on
+  first start, gitignored — back it up). A certificate stays valid for 1 year (portal setting).
+- **QR code = link + proof.** The QR on a certificate encodes
+  `https://ar-mining-training.vercel.app/#c=…` with the details, hash, key id and signature.
+  Scanning it with any phone camera opens the worker app's verify screen; the app (and the admin
+  portal) check the signature **offline** with the public key, then confirm revocation with the
+  server when online. Typing an ID (`CERT-0017`) checks it online.
+- **Sync engine.** Results and step events are queued in IndexedDB and uploaded whenever the phone
+  is online (on start, after each attempt, when the network returns, every few minutes), with
+  exponential backoff. The home screen chip shows _Synced_ / _N results to upload_ and syncs on tap.
+- **Blockchain (optional).** Certificate hashes can be anchored on **Polygon Amoy** (testnet):
+  set `ARMT_POLYGON_PRIVATE_KEY` on the API to a test wallet funded from the Amoy faucet and
+  restart it; the Blockchain Log page then anchors certificates and links each transaction on
+  PolygonScan. Without a key the stub adapter reports "not anchored yet" (nothing is faked).
+
+## Admin portal (Phase 5)
+
+```sh
+npm run dev:api     # API on :8000 (seeds a demo admin, 48 workers and a year of training history)
+npm run dev:admin   # portal on http://localhost:5174
+```
+
+**Demo admin: `admin@test.com` / `admin1234`** (change with `ARMT_ADMIN_EMAIL` /
+`ARMT_ADMIN_PASSWORD` before the first start, or add admins under Settings).
+
+Pages: Dashboard (KPIs, sites map, module results, insights, recent assessments, verify, common
+mistakes, critical errors, 3D module preview), Workers (filters, add/edit, PIN reset, history,
+per-step mastery, certificates), Modules (pass rates, hardest steps, quiz accuracy, trend),
+Assessments (every attempt with step breakdown), Certificates (revoke, PDF with QR), Verify
+Certificate (ID, QR camera scan or image, offline signature check), Blockchain Log, Reports (PDF
+and CSV compliance exports by period, sector and site) and Settings (pass mark, certificate
+validity, sites, admins, phones). English and हिन्दी.
+
+The generated demo history (results, retraining, signed certificates) is marked as demo data in
+the database; real uploads from phones appear alongside it. Start from an empty history with
+`ARMT_SEED_HISTORY=0`, or reset everything with `python -m app.seed --reset` (from
+`services/api`, inside its virtualenv).
+
+### Admin app on the phone (its own APK, not Chrome)
+
+```sh
+npm run dev:api        # the app talks to the API on this laptop
+npm run android:admin  # build portal → Capacitor → signed APK → adb install → launch
+```
+
+"AR Training Admin" appears in the app drawer next to "AR Mining Training". It is a Capacitor
+app: the portal is packaged inside the APK and runs in a native WebView, so it opens with no
+browser at all and its screens load without the laptop's web server. Data comes from the API at
+`http://localhost:8000` through `adb reverse` (the script sets it up; re-run
+`npm run phone:reverse` after reconnecting the cable). The server address can be changed on the
+login screen or under Settings. Exports open the Android share sheet (save to Files, Drive,
+WhatsApp…). Both apps are signed with the same key in `apps/android/keys/`.
+
+> The worker app stays a Trusted Web Activity (Chrome's engine) because WebXR AR is only
+> available in Chrome; a WebView app cannot run the AR scenes.
+
 ## Languages
 
 English, हिन्दी and ᱥᱟᱱᱛᱟᱲᱤ (Santali, Ol Chiki). Fonts are bundled for all three scripts.
@@ -146,6 +211,9 @@ English, हिन्दी and ᱥᱟᱱᱛᱟᱲᱤ (Santali, Ol Chiki). Fonts
 | `npm run app`           | Build and serve the installable app on :4173          |
 | `npm run phone:app`     | Point the phone at the installable app                |
 | `npm run android`       | Deploy, build the signed APK, install it on the phone |
+| `npm run dev:admin`     | Admin portal dev server on :5174                      |
+| `npm run admin:app`     | Build the admin portal and serve it on :4174          |
+| `npm run android:admin` | Build and install the admin Android app (Capacitor)   |
 | `npm run i18n:export`   | Export all strings to `translations/strings.csv`      |
 | `npm test`              | Unit tests (mobile, shared) and API tests (pytest)    |
 | `npm run typecheck`     | Strict TypeScript across workspaces                   |

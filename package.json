@@ -14,6 +14,7 @@
   "scripts": {
     "dev": "npm run dev -w @ar-training/mobile",
     "dev:mobile": "npm run dev -w @ar-training/mobile",
+    "dev:admin": "npm run dev -w @ar-training/admin",
     "dev:api": "node scripts/dev-api.mjs",
     "setup:api": "node scripts/setup-api.mjs",
     "phone": "node scripts/phone.mjs --open",
@@ -26,7 +27,9 @@
     "test": "npm run test --workspaces --if-present && npm run test:api",
     "test:api": "node scripts/test-api.mjs",
     "android": "node scripts/android.mjs",
+    "android:admin": "node scripts/android-admin.mjs",
     "app": "npm run build -w @ar-training/mobile && npm run preview -w @ar-training/mobile",
+    "admin:app": "npm run build -w @ar-training/admin && npm run preview -w @ar-training/admin",
     "phone:app": "node scripts/phone.mjs --open --app",
     "i18n:export": "node scripts/i18n-export.mjs"
   },
