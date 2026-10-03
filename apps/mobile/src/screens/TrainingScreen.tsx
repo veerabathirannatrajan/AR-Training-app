@@ -333,6 +333,10 @@ export function TrainingScreen({ moduleId, mode }: { moduleId: string; mode: Ren
           onHome={goHome}
           onAgain={() => again()}
           onRetrain={(stepIds) => again(stepIds)}
+          onCertificate={(certificateId) => {
+            goHome();
+            useNavigation.getState().navigate({ name: 'certificate', certificateId });
+          }}
         />
       )}
 

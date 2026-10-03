@@ -1,3 +1,4 @@
+import type { LanguageCode } from './languages';
 import type { RenderMode } from './render';
 
 export type SessionStatus = 'in-progress' | 'completed' | 'abandoned';
@@ -65,6 +66,10 @@ export interface ModuleResult {
   criticalErrors?: string[];
   quiz?: QuizAnswer[];
   steps: StepOutcome[];
+  /** App language during the attempt. */
+  language?: LanguageCode;
+  /** Pass mark (percent) the attempt was scored against. */
+  passMark?: number;
 }
 
 /** Percentage shown for a result, compatible with results saved before the assessment engine. */

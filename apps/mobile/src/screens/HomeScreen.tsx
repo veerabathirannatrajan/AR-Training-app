@@ -1,5 +1,7 @@
 import {
+  Award,
   BellRing,
+  ChevronRight,
   CircleCheck,
   CircleX,
   CloudOff,
@@ -8,6 +10,7 @@ import {
   LogOut,
   Menu,
   RefreshCw,
+  ScanLine,
   ShieldCheck,
   Smartphone,
   Sparkles,
@@ -19,6 +22,8 @@ import { useNavigation } from '../app/navigation';
 import { useInstallPrompt, useIsStandalone, useOnline, useServiceWorker } from '../app/platform';
 import { useSession } from '../app/session';
 import { logout } from '../data/auth';
+import { currentCertificate, stateOf, useTrust, useWorkerCertificates } from '../data/certificates';
+import type { CertificateRecord } from '../data/db';
 import { useDueDrills } from '../data/drills';
 import { NO_PROGRESS, useModuleProgress, type ModuleProgress } from '../data/progress';
 import {
@@ -34,6 +39,9 @@ import { LowPolyBackdrop } from '../design/LowPolyBackdrop';
 import { XR_UI_PROPS } from '../engine/xr/xrUi';
 import { useLocalized } from '../i18n/localized';
 import { MODULES, type ModuleDefinition } from '../modules/registry';
+import { StateIcon } from './certificates/CertificateCard';
+import { STATE_TONE } from './certificates/stateTone';
+import { SyncChip } from './certificates/SyncChip';
 import { LanguageSheet } from './LanguageSheet';
 import { SantaliDraftNotice } from './SantaliDraftNotice';
 
@@ -66,12 +74,16 @@ function ModuleCard({
   definition,
   progress,
   recommended,
+  certificate,
 }: {
   definition: ModuleDefinition;
   progress: ModuleProgress;
   recommended: boolean;
+  certificate: CertificateRecord | undefined;
 }) {
-  const { t } = useTranslation(['home', 'common']);
+  const { t } = useTranslation(['home', 'common', 'certificates']);
+  const trust = useTrust();
+  const certState = certificate != null ? stateOf(certificate, trust) : null;
   const localize = useLocalized();
   const { content, icon: Icon, accent } = definition;
   const title = localize(content.title);
@@ -128,6 +140,11 @@ function ModuleCard({
         >
           {statusLabel}
         </Chip>
+        {certState != null && (
+          <Chip tone={STATE_TONE[certState]} icon={<StateIcon state={certState} />}>
+            {t(`certificates:chip.${certState}`)}
+          </Chip>
+        )}
       </div>
       <ProgressBar value={STATUS_PROGRESS[progress.status]} tone={done ? 'ok' : 'accent'} />
       <div className="row-between t-small t-muted">
@@ -147,7 +164,7 @@ function ModuleCard({
 }
 
 export function HomeScreen() {
-  const { t } = useTranslation(['home', 'common']);
+  const { t } = useTranslation(['home', 'common', 'certificates']);
   const worker = useSession((state) => state.worker);
   const progress = useModuleProgress(worker?.workerId ?? null);
   const online = useOnline();
@@ -155,6 +172,7 @@ export function HomeScreen() {
   const install = useInstallPrompt();
   const standalone = useIsStandalone();
   const dueDrills = useDueDrills(worker?.workerId ?? null);
+  const certificates = useWorkerCertificates(worker?.workerId ?? null);
   const localize = useLocalized();
   const [sheet, setSheet] = useState<'menu' | 'language' | null>(null);
 
@@ -199,6 +217,7 @@ export function HomeScreen() {
               {t('common:status.offlineReady')}
             </Chip>
           )}
+          <SyncChip />
         </div>
 
         {serviceWorker.updateReady && (
@@ -257,6 +276,38 @@ export function HomeScreen() {
           );
         })}
 
+        <div className="home-shortcuts">
+          <button
+            type="button"
+            className="glass home-shortcut"
+            onClick={() => useNavigation.getState().navigate({ name: 'certificates' })}
+            {...XR_UI_PROPS}
+          >
+            <span className="home-shortcut-icon">
+              <Award size={22} />
+            </span>
+            <span className="grow stack-1">
+              <strong>{t('certificates:open')}</strong>
+              <span className="t-small t-muted t-num">{certificates?.length ?? 0}</span>
+            </span>
+            <ChevronRight size={20} className="t-faint" />
+          </button>
+          <button
+            type="button"
+            className="glass home-shortcut"
+            onClick={() => useNavigation.getState().navigate({ name: 'verify' })}
+            {...XR_UI_PROPS}
+          >
+            <span className="home-shortcut-icon">
+              <ScanLine size={22} />
+            </span>
+            <span className="grow">
+              <strong>{t('certificates:verify.open')}</strong>
+            </span>
+            <ChevronRight size={20} className="t-faint" />
+          </button>
+        </div>
+
         <h2 className="t-heading section-title">{t('modulesTitle')}</h2>
         <div className="stack-2">
           {MODULES.map((definition) => {
@@ -269,6 +320,12 @@ export function HomeScreen() {
                 recommended={
                   definition.content.kind === 'tutorial' && moduleProgress.status !== 'completed'
                 }
+                certificate={
+                  certificates != null
+                    ? (currentCertificate(certificates, definition.content.id) ??
+                      certificates.find((cert) => cert.moduleId === definition.content.id))
+                    : undefined
+                }
               />
             );
           })}
@@ -278,6 +335,28 @@ export function HomeScreen() {
       {sheet === 'menu' && (
         <Sheet title={t('menu.title')} onClose={() => setSheet(null)}>
           <div className="sheet-actions">
+            <Button
+              variant="secondary"
+              block
+              icon={<Award size={20} />}
+              onClick={() => {
+                setSheet(null);
+                useNavigation.getState().navigate({ name: 'certificates' });
+              }}
+            >
+              {t('certificates:open')}
+            </Button>
+            <Button
+              variant="secondary"
+              block
+              icon={<ScanLine size={20} />}
+              onClick={() => {
+                setSheet(null);
+                useNavigation.getState().navigate({ name: 'verify' });
+              }}
+            >
+              {t('certificates:verify.open')}
+            </Button>
             <Button
               variant="secondary"
               block

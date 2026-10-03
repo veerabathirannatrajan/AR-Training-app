@@ -32,3 +32,22 @@ def create_worker_token(worker_id: str, now: datetime | None = None) -> tuple[st
         algorithm="HS256",
     )
     return token, expires_at
+
+
+def hash_password(password: str, salt: str) -> str:
+    return hash_pin(password, salt)
+
+
+def verify_password(password: str, salt: str, expected_hash: str) -> bool:
+    return verify_pin(password, salt, expected_hash)
+
+
+def create_admin_token(admin_id: int, now: datetime | None = None) -> tuple[str, datetime]:
+    issued_at = now or datetime.now(UTC)
+    expires_at = issued_at + timedelta(hours=settings.admin_token_hours)
+    token = jwt.encode(
+        {"sub": str(admin_id), "role": "admin", "iat": issued_at, "exp": expires_at},
+        settings.jwt_secret,
+        algorithm="HS256",
+    )
+    return token, expires_at

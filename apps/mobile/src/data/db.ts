@@ -1,4 +1,5 @@
 import type {
+  Certificate,
   ModuleResult,
   TrainingEvent,
   TrainingSession,
@@ -24,17 +25,22 @@ export interface LocalWorker extends WorkerProfile {
   lastOnlineLoginAt: number;
 }
 
-/** Certificates are issued in Phase 4; the table exists now so the schema stays stable. */
-export interface CertificateRecord {
-  id: string;
-  workerId: string;
-  moduleId: string;
-  score: number;
-  issuedAt: string;
-  expiresAt: string;
-  hash: string;
-  signature: string | null;
-  status: 'provisional' | 'valid' | 'revoked';
+/**
+ * A certificate on this phone: provisional (issued offline on a pass, id `P-XXXXXXXX`, not
+ * signed) until the sync engine replaces it with the server's signed certificate (CERT-0001).
+ */
+export interface CertificateRecord extends Certificate {
+  /** When the server copy was last received (null for provisional certificates). */
+  syncedAt: number | null;
+}
+
+/** A result on this phone, with what the server decided once it was uploaded. */
+export interface LocalResult extends ModuleResult {
+  syncedAt?: number;
+  /** Certificate the server linked to this result (a pass). */
+  certificateId?: string | null;
+  /** Why the server refused the upload (not retried). */
+  syncError?: string;
 }
 
 export type SyncKind = 'session-result';
@@ -77,7 +83,7 @@ export class TrainingDatabase extends Dexie {
   declare workers: EntityTable<LocalWorker, 'workerId'>;
   declare sessions: EntityTable<TrainingSession, 'id'>;
   declare events: EntityTable<TrainingEvent, 'id'>;
-  declare results: EntityTable<ModuleResult, 'id'>;
+  declare results: EntityTable<LocalResult, 'id'>;
   declare certificates: EntityTable<CertificateRecord, 'id'>;
   declare syncQueue: EntityTable<SyncQueueItem, 'seq'>;
   declare settings: EntityTable<SettingRecord, 'key'>;
@@ -97,6 +103,10 @@ export class TrainingDatabase extends Dexie {
     // v2 (Phase 2): refresher micro-drills.
     this.version(2).stores({
       drills: 'id, workerId, moduleId, dueAt, [workerId+moduleId]',
+    });
+    // v3 (Phase 4): signed certificates (the table was empty until now).
+    this.version(3).stores({
+      certificates: 'id, workerId, moduleId, resultId, status, [workerId+moduleId]',
     });
   }
 }

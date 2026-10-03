@@ -31,7 +31,16 @@ export interface WorkerLoginResponse {
   worker: WorkerProfile;
 }
 
-export type ApiErrorCode = 'invalid-credentials' | 'locked' | 'inactive' | 'validation';
+export type ApiErrorCode =
+  | 'invalid-credentials'
+  | 'locked'
+  | 'inactive'
+  | 'validation'
+  | 'unauthorized'
+  | 'forbidden'
+  | 'not-found'
+  | 'conflict'
+  | 'not-configured';
 
 /** Body of every non-2xx API response. */
 export interface ApiErrorBody {

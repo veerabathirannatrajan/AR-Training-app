@@ -31,6 +31,8 @@ export function scoreAttempt(args: {
   quiz: readonly QuizAnswer[];
   quizTotal: number;
   criticalErrors: readonly string[];
+  /** Percent; defaults to ASSESSMENT_RULES.passMark (the admin portal can change it). */
+  passMark?: number;
 }): AttemptScore {
   const counted = args.steps.filter((step) => step.skipped !== true);
   const practicalPercent = percent(
@@ -69,7 +71,7 @@ export function scoreAttempt(args: {
       failReason: 'critical-error',
     };
   }
-  const passed = totalPercent >= ASSESSMENT_RULES.passMark;
+  const passed = totalPercent >= (args.passMark ?? ASSESSMENT_RULES.passMark);
   return {
     practicalPercent,
     quizPercent,

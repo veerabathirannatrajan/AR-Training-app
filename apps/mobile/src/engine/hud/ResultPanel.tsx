@@ -5,6 +5,7 @@ import {
   type TrainingModuleContent,
 } from '@ar-training/shared';
 import {
+  Award,
   CircleCheck,
   CircleX,
   House,
@@ -17,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useResultCertificate } from '../../data/certificates';
 import { Button } from '../../design/components';
 import { cx } from '../../design/cx';
 import { useLocalized } from '../../i18n/localized';
@@ -39,14 +41,17 @@ export function ResultPanel({
   onHome,
   onAgain,
   onRetrain,
+  onCertificate,
 }: {
   module: TrainingModuleContent;
   result: ModuleResult;
   onHome: () => void;
   onAgain: () => void;
   onRetrain: (stepIds: string[]) => void;
+  onCertificate: (certificateId: string) => void;
 }) {
-  const { t } = useTranslation('training');
+  const { t } = useTranslation(['training', 'certificates']);
+  const certificate = useResultCertificate(result.passed === true ? result.id : null);
   const localize = useLocalized();
   const assessment = result.attemptType === 'assessment';
   const retraining = result.attemptType === 'retraining';
@@ -196,14 +201,25 @@ export function ResultPanel({
       </ol>
 
       <div className="sheet-actions">
+        {certificate != null && (
+          <Button
+            size="lg"
+            block
+            variant="success"
+            icon={<Award size={20} />}
+            onClick={() => onCertificate(certificate.id)}
+          >
+            {t('certificates:view')}
+          </Button>
+        )}
         {retrain.length > 0 && (
           <Button size="lg" block icon={<Target size={20} />} onClick={() => onRetrain(retrain)}>
             {t('assessment.retrain')}
           </Button>
         )}
         <Button
-          size={retrain.length > 0 ? 'md' : 'lg'}
-          variant={retrain.length > 0 ? 'secondary' : 'primary'}
+          size={retrain.length > 0 || certificate != null ? 'md' : 'lg'}
+          variant={retrain.length > 0 || certificate != null ? 'secondary' : 'primary'}
           block
           icon={<House size={20} />}
           onClick={onHome}

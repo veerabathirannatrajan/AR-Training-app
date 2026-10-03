@@ -1,38 +1,37 @@
 import math
 from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.db import get_db
-from app.models import Worker
-from app.schemas import WorkerLoginRequest, WorkerLoginResponse, WorkerProfile
-from app.security import create_worker_token, hash_pin, new_salt, verify_pin
+from app.errors import api_error
+from app.models import Admin, Worker
+from app.schemas import (
+    AdminLoginRequest,
+    AdminLoginResponse,
+    AdminProfile,
+    WorkerLoginRequest,
+    WorkerLoginResponse,
+    WorkerProfile,
+)
+from app.security import (
+    create_admin_token,
+    create_worker_token,
+    hash_password,
+    hash_pin,
+    new_salt,
+    verify_password,
+    verify_pin,
+)
+from app.timeutil import as_utc_or_none, iso
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 # Hashing a PIN for unknown IDs too keeps response times equal, so IDs can't be probed.
 _UNKNOWN_WORKER_SALT = new_salt()
-
-
-def api_error(
-    status_code: int, code: str, message: str, retry_after_seconds: int | None = None
-) -> HTTPException:
-    """Error body shape shared with the clients: {"detail": {"code", "message", ...}}."""
-    detail: dict[str, object] = {"code": code, "message": message}
-    headers = None
-    if retry_after_seconds is not None:
-        detail["retryAfterSeconds"] = retry_after_seconds
-        headers = {"Retry-After": str(retry_after_seconds)}
-    return HTTPException(status_code=status_code, detail=detail, headers=headers)
-
-
-def _as_utc(value: datetime | None) -> datetime | None:
-    # SQLite returns naive datetimes even for timezone-aware columns.
-    if value is None or value.tzinfo is not None:
-        return value
-    return value.replace(tzinfo=UTC)
 
 
 def worker_profile(worker: Worker) -> WorkerProfile:
@@ -48,6 +47,17 @@ def worker_profile(worker: Worker) -> WorkerProfile:
     )
 
 
+def admin_profile(admin: Admin) -> AdminProfile:
+    return AdminProfile(
+        id=admin.id,
+        email=admin.email,
+        name=admin.name,
+        active=admin.active,
+        created_at=iso(admin.created_at) or "",
+        last_login_at=iso(as_utc_or_none(admin.last_login_at)),
+    )
+
+
 @router.post("/worker/login", response_model=WorkerLoginResponse)
 def worker_login(body: WorkerLoginRequest, db: Session = Depends(get_db)) -> WorkerLoginResponse:
     now = datetime.now(UTC)
@@ -60,7 +70,7 @@ def worker_login(body: WorkerLoginRequest, db: Session = Depends(get_db)) -> Wor
         hash_pin(body.pin, _UNKNOWN_WORKER_SALT)
         raise invalid
 
-    locked_until = _as_utc(worker.locked_until)
+    locked_until = as_utc_or_none(worker.locked_until)
     if locked_until is not None and locked_until > now:
         raise api_error(
             status.HTTP_423_LOCKED,
@@ -94,3 +104,31 @@ def worker_login(body: WorkerLoginRequest, db: Session = Depends(get_db)) -> Wor
 
     token, expires_at = create_worker_token(worker.id, now)
     return WorkerLoginResponse(token=token, expires_at=expires_at, worker=worker_profile(worker))
+
+
+_UNKNOWN_ADMIN_SALT = new_salt()
+
+
+@router.post("/admin/login", response_model=AdminLoginResponse)
+def admin_login(body: AdminLoginRequest, db: Session = Depends(get_db)) -> AdminLoginResponse:
+    invalid = api_error(
+        status.HTTP_401_UNAUTHORIZED, "invalid-credentials", "Email or password is incorrect."
+    )
+    admin = db.scalars(
+        select(Admin).where(func.lower(Admin.email) == body.email.strip().lower())
+    ).first()
+    if admin is None:
+        hash_password(body.password, _UNKNOWN_ADMIN_SALT)
+        raise invalid
+    if not verify_password(body.password, admin.password_salt, admin.password_hash):
+        raise invalid
+    if not admin.active:
+        raise api_error(status.HTTP_403_FORBIDDEN, "inactive", "This admin account is disabled.")
+
+    now = datetime.now(UTC)
+    admin.last_login_at = now
+    db.commit()
+    token, expires_at = create_admin_token(admin.id, now)
+    return AdminLoginResponse(
+        token=token, expires_at=iso(expires_at) or "", admin=admin_profile(admin)
+    )

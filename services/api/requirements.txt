@@ -2,6 +2,10 @@ fastapi>=0.142,<1
 uvicorn[standard]>=0.54,<1
 sqlalchemy>=2.0,<3
 pyjwt>=2.10,<3
+pynacl>=1.5,<2
+reportlab>=4,<6
+# Polygon Amoy anchoring (only used when ARMT_POLYGON_PRIVATE_KEY is set)
+eth-account>=0.13,<1
 
 # Tests
 pytest>=8,<10

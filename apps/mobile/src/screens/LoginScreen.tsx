@@ -1,5 +1,5 @@
 import { LANGUAGES, PIN_LENGTH } from '@ar-training/shared';
-import { Delete, Globe, Info, LoaderCircle, UserRound, WifiOff } from 'lucide-react';
+import { Delete, Globe, Info, LoaderCircle, ScanLine, UserRound, WifiOff } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '../app/navigation';
@@ -64,7 +64,7 @@ function PinPad({
 }
 
 export function LoginScreen() {
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation(['auth', 'certificates']);
   const online = useOnline();
   const lang = useLanguage();
   const [stage, setStage] = useState<'worker-id' | 'pin'>('worker-id');
@@ -212,6 +212,15 @@ export function LoginScreen() {
             {t('login.demoHint')}
           </p>
         )}
+        <button
+          type="button"
+          className="link-button row verify-link"
+          onClick={() => useNavigation.getState().navigate({ name: 'verify' })}
+          {...XR_UI_PROPS}
+        >
+          <ScanLine size={18} />
+          {t('certificates:verify.open')}
+        </button>
       </div>
     </main>
   );

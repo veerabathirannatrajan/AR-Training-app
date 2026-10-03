@@ -1,0 +1,100 @@
+{
+  "title": "My certificates",
+  "open": "My certificates",
+  "empty": "Pass an assessed module to earn a certificate. It appears here straight away, even offline.",
+  "view": "View certificate",
+  "heading": "Certificate of Safety Training",
+  "certifies": "This certifies that",
+  "passed": "passed the assessed AR safety training module",
+  "score": "Score",
+  "issued": "Issued",
+  "validUntil": "Valid until",
+  "id": "Certificate ID",
+  "workerId": "Worker ID",
+  "worker": "Worker",
+  "module": "Module",
+  "validity": "Validity",
+  "scanHint": "Scan to verify",
+  "state": {
+    "provisional": "Provisional",
+    "valid": "Valid",
+    "expiring": "Expiring soon",
+    "expired": "Expired",
+    "revoked": "Revoked"
+  },
+  "note": {
+    "provisional": "Issued on this phone. The training office signs it when the phone next connects to the internet.",
+    "valid": "Signed by the training office. Anyone can check it by scanning the QR code, even offline.",
+    "expiring": "Expires soon. Take the assessment again to renew it.",
+    "expired": "This certificate has expired. Take the assessment again to renew it.",
+    "revoked": "The training office has revoked this certificate."
+  },
+  "anchor": {
+    "anchored": "Recorded on Polygon Amoy",
+    "pending": "Being recorded on Polygon Amoy",
+    "none": "Not on the blockchain yet"
+  },
+  "chip": {
+    "provisional": "Certificate waiting to sync",
+    "valid": "Certified",
+    "expiring": "Certificate expires soon",
+    "expired": "Certificate expired",
+    "revoked": "Certificate revoked"
+  },
+  "verify": {
+    "title": "Verify a certificate",
+    "open": "Verify a certificate",
+    "intro": "Scan the QR code on a worker's certificate, or type its ID.",
+    "scan": "Scan QR code",
+    "stopScan": "Stop camera",
+    "scanning": "Point the camera at the certificate QR code",
+    "orEnter": "Or type the certificate ID",
+    "placeholder": "CERT-0017",
+    "check": "Check",
+    "checking": "Checking…",
+    "cameraBlocked": "Camera access was refused. Allow the camera for this app, or type the ID.",
+    "cameraUnavailable": "No camera is available here. Type the certificate ID instead.",
+    "notCertificate": "This QR code is not an AR Mining Training certificate.",
+    "invalidId": "Type an ID like CERT-0017.",
+    "needsOnline": "Checking by ID needs the internet. Scanning the QR code works offline.",
+    "verdict": {
+      "valid": "Valid certificate",
+      "expired": "Expired",
+      "revoked": "Revoked",
+      "provisional": "Provisional",
+      "unknown-key": "Cannot check offline yet",
+      "invalid": "Not valid",
+      "not-found": "Not found"
+    },
+    "verdictBody": {
+      "valid": "Genuine: signed by the training office and not expired.",
+      "expired": "Genuine, but it expired on {{date}}.",
+      "revoked": "The training office has revoked this certificate.",
+      "provisional": "Not signed yet: the worker's phone has not synced. Ask them to connect to the internet.",
+      "unknown-key": "Signed with a key this phone does not know yet. Connect to the internet once and check again.",
+      "invalid": "The details do not match the signature. The certificate may have been changed.",
+      "not-found": "There is no certificate with this ID."
+    },
+    "checks": {
+      "hash": "Details match the fingerprint (SHA-256)",
+      "signature": "Signature of the training office (Ed25519)",
+      "expiry": "Not expired",
+      "revocation": "Not revoked"
+    },
+    "checkedOffline": "Checked offline on this phone",
+    "checkedOnline": "Confirmed with the training office server",
+    "revocationUnknown": "Revocation list not downloaded yet",
+    "again": "Check another",
+    "done": "Done"
+  },
+  "sync": {
+    "synced": "Synced",
+    "syncing": "Syncing…",
+    "pending_one": "{{count}} result to upload",
+    "pending_other": "{{count}} results to upload",
+    "offline": "Saved on phone",
+    "needsLogin": "Log in online to upload",
+    "error": "Upload failed, retrying",
+    "tap": "Sync now"
+  }
+}

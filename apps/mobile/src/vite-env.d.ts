@@ -8,3 +8,8 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+/** The API's certificate public key(s) at build time (vite.config.ts), for offline verification. */
+declare const __ARMT_CERT_KEYS__: import('@ar-training/shared').SigningKey[];
+/** App version reported to the API on sync. */
+declare const __APP_VERSION__: string;

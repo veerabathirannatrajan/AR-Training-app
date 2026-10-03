@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigation } from '../app/navigation';
+import { takeCertificateLink, useNavigation } from '../app/navigation';
 import { useSession } from '../app/session';
 import { currentWorker } from '../data/auth';
 import { AppMark } from '../design/AppMark';
@@ -24,7 +24,7 @@ export function SplashScreen() {
         minimum,
       ]);
       if (cancelled) return;
-      const { reset } = useNavigation.getState();
+      const { reset, navigate } = useNavigation.getState();
       if (storedLanguage() == null) {
         reset({ name: 'language', next: 'login' });
       } else if (worker == null) {
@@ -33,6 +33,8 @@ export function SplashScreen() {
         useSession.getState().setWorker(worker);
         reset({ name: 'home' });
       }
+      const certificateLink = takeCertificateLink();
+      if (certificateLink != null) navigate({ name: 'verify', payload: certificateLink });
     })();
     return () => {
       cancelled = true;

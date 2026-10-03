@@ -1,6 +1,10 @@
 import type {
   ApiErrorBody,
   HealthResponse,
+  SyncRequest,
+  SyncResponse,
+  TrustBundle,
+  VerifyResponse,
   WorkerLoginRequest,
   WorkerLoginResponse,
 } from '@ar-training/shared';
@@ -58,4 +62,23 @@ export function loginWorker(body: WorkerLoginRequest): Promise<WorkerLoginRespon
     method: 'POST',
     body: JSON.stringify(body),
   });
+}
+
+/** Pushes queued results and pulls certificates, keys, revocations and settings. */
+export function postSync(token: string, body: SyncRequest): Promise<SyncResponse> {
+  return request<SyncResponse>(
+    '/api/sync',
+    { method: 'POST', body: JSON.stringify(body), headers: { Authorization: `Bearer ${token}` } },
+    20000,
+  );
+}
+
+/** Public keys and revoked certificate ids (no login needed). */
+export function fetchTrustBundle(): Promise<TrustBundle> {
+  return request<TrustBundle>('/api/certificates/keys', {}, 5000);
+}
+
+/** Live certificate status from the server (no login needed). */
+export function fetchVerification(certificateId: string): Promise<VerifyResponse> {
+  return request<VerifyResponse>(`/api/verify/${encodeURIComponent(certificateId)}`, {}, 6000);
 }

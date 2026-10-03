@@ -1,6 +1,29 @@
 import react from '@vitejs/plugin-react';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { defineConfig, type Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+
+const APP_VERSION = '0.4.0';
+const CERT_PUBLIC_KEY_FILE = fileURLToPath(
+  new URL('../../services/api/keys/cert_signing_ed25519.pub', import.meta.url),
+);
+
+/**
+ * The API's certificate public key, baked into the build when the API has created it (on its
+ * first start), so a fresh install can verify certificate QR codes offline before its first sync.
+ */
+function builtInCertKeys() {
+  if (!existsSync(CERT_PUBLIC_KEY_FILE)) return [];
+  const publicKey = readFileSync(CERT_PUBLIC_KEY_FILE, 'utf8').trim();
+  if (!/^[0-9a-f]{64}$/.test(publicKey)) return [];
+  const keyId = createHash('sha256')
+    .update(Buffer.from(publicKey, 'hex'))
+    .digest('hex')
+    .slice(0, 8);
+  return [{ keyId, algorithm: 'Ed25519', publicKey }];
+}
 
 const XR_EMULATOR_STUB = '\0xr-emulator-stub';
 
@@ -32,6 +55,10 @@ function stripXREmulator(): Plugin {
 // to 127.0.0.1 on the laptop. Binding to 127.0.0.1 explicitly avoids Node resolving
 // "localhost" to ::1 only, which adb reverse cannot reach.
 export default defineConfig({
+  define: {
+    __ARMT_CERT_KEYS__: JSON.stringify(builtInCertKeys()),
+    __APP_VERSION__: JSON.stringify(APP_VERSION),
+  },
   plugins: [
     stripXREmulator(),
     react(),

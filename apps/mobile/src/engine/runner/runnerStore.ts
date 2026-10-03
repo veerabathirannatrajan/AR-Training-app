@@ -1,19 +1,29 @@
 import {
+  LANGUAGE_CODES,
   scoreAttempt,
   type AttemptType,
+  type LanguageCode,
   type LocalizedText,
   type ModuleResult,
   type ModuleStep,
   type QuizAnswer,
   type RenderMode,
   type StepOutcome,
+  type SyncSettings,
   type TrainingAction,
   type TrainingEvent,
   type TrainingModuleContent,
 } from '@ar-training/shared';
+import i18next from 'i18next';
 import { create } from 'zustand';
+import {
+  DEFAULT_SETTINGS,
+  getAppSettings,
+  issueProvisionalCertificate,
+} from '../../data/certificates';
 import { db } from '../../data/db';
 import { scheduleRefresherDrills } from '../../data/drills';
+import { requestSync } from '../../data/sync';
 
 /** Points lost per mistake on a step (never below zero for that step). */
 export const MISTAKE_PENALTY = 5;
@@ -79,6 +89,8 @@ interface RunnerState {
   quizAnswers: QuizAnswer[];
   feedback: Feedback | null;
   result: ModuleResult | null;
+  /** Portal settings (pass mark, certificate validity) in force for this attempt. */
+  settings: SyncSettings;
 
   start: (args: StartArgs) => Promise<void>;
   completeStep: (
@@ -108,6 +120,9 @@ interface RunnerState {
 }
 
 let advanceTimer: ReturnType<typeof setTimeout> | null = null;
+
+const isLanguage = (value: unknown): value is LanguageCode =>
+  (LANGUAGE_CODES as readonly unknown[]).includes(value);
 let feedbackId = 0;
 
 function clearAdvanceTimer() {
@@ -140,6 +155,7 @@ const idle = {
   quizAnswers: [] as QuizAnswer[],
   feedback: null,
   result: null,
+  settings: DEFAULT_SETTINGS,
 };
 
 const freshStep = () => ({
@@ -230,6 +246,7 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
       quiz: state.quizAnswers,
       quizTotal: module.quiz?.length ?? 0,
       criticalErrors: state.criticalErrors,
+      passMark: state.settings.passMark,
     });
     const counted = state.outcomes.filter((outcome) => outcome.skipped !== true);
     const result: ModuleResult = {
@@ -252,10 +269,20 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
       criticalErrors: state.criticalErrors,
       quiz: state.quizAnswers,
       steps: state.outcomes,
+      ...(isLanguage(i18next.language) ? { language: i18next.language } : {}),
+      ...(score.passed != null ? { passMark: state.settings.passMark } : {}),
     };
     set({ status: 'finished', result, stepDone: true, feedback: null });
     try {
-      await db.transaction('rw', [db.results, db.sessions, db.syncQueue, db.drills], async () => {
+      const tables = [
+        db.results,
+        db.sessions,
+        db.syncQueue,
+        db.drills,
+        db.certificates,
+        db.workers,
+      ];
+      await db.transaction('rw', tables, async () => {
         await db.results.add(result);
         await db.sessions.update(sessionId, { status: 'completed', endedAt: now });
         await db.syncQueue.add({
@@ -267,8 +294,22 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
           nextAttemptAt: now,
           lastError: null,
         });
-        if (result.passed === true) await scheduleRefresherDrills(workerId, module.id, now);
+        if (result.passed === true) {
+          await scheduleRefresherDrills(workerId, module.id, now);
+          if (result.attemptType === 'assessment') {
+            await issueProvisionalCertificate({
+              workerId,
+              moduleId: module.id,
+              moduleVersion: module.version,
+              resultId: result.id,
+              score: score.totalPercent,
+              passedAt: now,
+              settings: state.settings,
+            });
+          }
+        }
       });
+      void requestSync();
     } catch (error) {
       console.error('[runner] could not save result', error);
     }
@@ -279,6 +320,7 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
 
     async start({ module, workerId, mode, focusStepIds, defaultFacts }) {
       clearAdvanceTimer();
+      const settings = await getAppSettings().catch(() => DEFAULT_SETTINGS);
       const now = Date.now();
       const sessionId = crypto.randomUUID();
       const retraining = focusStepIds != null && focusStepIds.length > 0;
@@ -309,6 +351,7 @@ export const useRunnerStore = create<RunnerState>()((set, get) => {
         workerId,
         mode,
         startedAt: now,
+        settings,
         stepIndex: firstIndex,
         skippedStepIds,
         outcomes: skippedOutcomes,

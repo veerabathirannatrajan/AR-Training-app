@@ -7,3 +7,6 @@ export * from './content';
 export * from './results';
 export * from './assessment';
 export * from './modules';
+export * from './certificates';
+export * from './sync';
+export * from './admin';

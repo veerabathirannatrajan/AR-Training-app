@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber';
 import { XR } from '@react-three/xr';
 import { useEffect } from 'react';
+import { startSyncEngine } from './data/sync';
 import { createPortal } from 'react-dom';
 import { installBackGuard, useCurrentRoute, type Route } from './app/navigation';
 import { useOrientationLock, type OrientationNeed } from './app/orientation';
@@ -11,6 +12,8 @@ import { useXRSession } from './engine/xr/useXRSession';
 import { xrStore } from './engine/xr/xrStore';
 import { overlayRoot } from './lib/overlayRoot';
 import { findModule } from './modules/registry';
+import { CertificateScreen } from './screens/CertificateScreen';
+import { CertificatesScreen } from './screens/CertificatesScreen';
 import { DeviceCheckScreen } from './screens/DeviceCheckScreen';
 import { DrillScreen } from './screens/DrillScreen';
 import { HomeScreen } from './screens/HomeScreen';
@@ -19,6 +22,7 @@ import { LoginScreen } from './screens/LoginScreen';
 import { ModuleIntroScreen } from './screens/ModuleIntroScreen';
 import { SplashScreen } from './screens/SplashScreen';
 import { TrainingScreen } from './screens/TrainingScreen';
+import { VerifyScreen } from './screens/VerifyScreen';
 
 function Screen({ route }: { route: Route }) {
   switch (route.name) {
@@ -38,6 +42,12 @@ function Screen({ route }: { route: Route }) {
       return <TrainingScreen moduleId={route.moduleId} mode={route.mode} />;
     case 'drill':
       return <DrillScreen drillId={route.drillId} />;
+    case 'certificates':
+      return <CertificatesScreen />;
+    case 'certificate':
+      return <CertificateScreen certificateId={route.certificateId} />;
+    case 'verify':
+      return <VerifyScreen {...(route.payload != null ? { payload: route.payload } : {})} />;
   }
 }
 
@@ -86,6 +96,7 @@ export function App() {
   useOrientationLock(orientationFor(route));
   useBlockXRSelectOnUI(overlayRoot);
   useEffect(() => installBackGuard(), []);
+  useEffect(() => startSyncEngine(), []);
   useEffect(() => {
     overlayRoot.classList.toggle('in-ar', xrSession != null);
   }, [xrSession]);

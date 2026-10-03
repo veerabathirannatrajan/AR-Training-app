@@ -10,6 +10,7 @@ import '@fontsource/noto-sans-ol-chiki/ol-chiki-600.css';
 import '@fontsource/noto-sans-ol-chiki/ol-chiki-700.css';
 import './design/design.css';
 import './design/screens.css';
+import './design/certificates.css';
 import './engine/hud/hud.css';
 import './i18n';
 

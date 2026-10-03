@@ -1,5 +1,6 @@
 import { ApiError, loginWorker, NetworkError } from '../lib/api';
 import { db, getSetting, setSetting, type LocalWorker } from './db';
+import { requestSync } from './sync';
 import { createPinVerifier, verifyPin } from './pin';
 
 const CURRENT_WORKER_KEY = 'currentWorkerId';
@@ -74,6 +75,8 @@ export async function login(
     };
     await db.workers.put(worker);
     await setSetting(CURRENT_WORKER_KEY, worker.workerId);
+    // Upload anything waiting (also for this worker's earlier offline attempts).
+    void requestSync({ pull: true, retryNow: true });
     return { ok: true, worker, offline: false };
   } catch (error) {
     if (error instanceof NetworkError) return offlineLogin(cached, pin, now);

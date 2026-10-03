@@ -1,7 +1,9 @@
-"""Demo data: 4 Jharkhand sites and 48 workers. Every demo worker's PIN is 1234.
+"""Demo data: 4 Jharkhand sites, 48 workers, a portal admin and a training history.
 
-Run manually with `python -m app.seed [--reset]` (from services/api), or let the API seed an
-empty database on startup (disable with ARMT_SEED_DEMO=0).
+Every demo worker's PIN is 1234; the demo admin is admin@test.com / admin1234 (see config).
+Run manually with `python -m app.seed [--reset] [--no-history]` (from services/api), or let the
+API seed an empty database on startup (disable with ARMT_SEED_DEMO=0, or only the generated
+training history with ARMT_SEED_HISTORY=0).
 """
 
 import sys
@@ -10,9 +12,11 @@ from datetime import UTC, datetime
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.db import Base, SessionLocal, engine, init_db
-from app.models import Site, Worker
-from app.security import hash_pin, new_salt
+from app.demo_history import seed_history
+from app.models import Admin, Site, Worker
+from app.security import hash_password, hash_pin, new_salt
 
 DEMO_PIN = "1234"
 
@@ -98,13 +102,33 @@ def database_is_empty(session: Session) -> bool:
     return session.scalars(select(Site.id).limit(1)).first() is None
 
 
+def seed_admin(session: Session) -> bool:
+    """Creates the demo portal admin when there is no admin yet."""
+    if session.scalars(select(Admin.id).limit(1)).first() is not None:
+        return False
+    salt = new_salt()
+    session.add(Admin(
+        email=settings.demo_admin_email.lower(),
+        name="Training Admin",
+        password_salt=salt,
+        password_hash=hash_password(settings.demo_admin_password, salt),
+        active=True,
+        created_at=datetime.now(UTC),
+    ))
+    session.commit()
+    return True
+
+
 def main(argv: list[str]) -> None:
     if "--reset" in argv:
         Base.metadata.drop_all(engine)
     init_db()
     with SessionLocal() as session:
         created = seed(session)
-    print(f"Seeded {created} workers across {len(SITES)} sites (demo PIN {DEMO_PIN}).")
+        seed_admin(session)
+        results = 0 if "--no-history" in argv else seed_history(session)
+    print(f"Seeded {created} workers across {len(SITES)} sites (demo PIN {DEMO_PIN}), "
+          f"{results} training results. Admin: {settings.demo_admin_email}.")
 
 
 if __name__ == "__main__":

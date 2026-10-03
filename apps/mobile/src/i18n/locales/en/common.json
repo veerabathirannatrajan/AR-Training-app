@@ -12,7 +12,8 @@
     "listen": "Listen",
     "installApp": "Install app",
     "update": "Update",
-    "logout": "Log out"
+    "logout": "Log out",
+    "share": "Share"
   },
   "status": {
     "online": "Online",
