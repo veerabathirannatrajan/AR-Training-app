@@ -45,7 +45,12 @@ function signed(payload: CertificatePayload) {
 function serverSays(verdict: VerifyResponse['verdict'], hash: string) {
   const response: VerifyResponse = {
     verdict,
-    checks: { hashMatches: true, signatureValid: true, expired: false, revoked: verdict === 'revoked' },
+    checks: {
+      hashMatches: true,
+      signatureValid: true,
+      expired: false,
+      revoked: verdict === 'revoked',
+    },
     checkedAt: new Date().toISOString(),
     certificate: {
       ...PAYLOAD,

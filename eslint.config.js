@@ -6,7 +6,16 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['**/dist/**', '**/dev-dist/**', '**/node_modules/**', 'services/**', '**/*.d.ts'],
+    ignores: [
+      '**/dist/**',
+      '**/dev-dist/**',
+      '**/node_modules/**',
+      'services/**',
+      '**/*.d.ts',
+      // Native Android projects (Capacitor, Bubblewrap) and their Gradle output
+      'apps/admin/android/**',
+      'apps/android/twa/**',
+    ],
   },
   {
     files: ['scripts/**/*.mjs', '*.js'],
