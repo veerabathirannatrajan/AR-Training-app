@@ -6,6 +6,7 @@ import { useNavigation } from '../app/navigation';
 import { Button, IconButton, Notice } from '../design/components';
 import { LowPolyBackdrop } from '../design/LowPolyBackdrop';
 import { engine } from '../engine/engineStore';
+import { useStageStatus } from '../engine/stageStatus';
 import {
   classifyARStartError,
   detectXRCapabilities,
@@ -19,6 +20,8 @@ export function DeviceCheckScreen({ moduleId }: { moduleId: string }) {
   const [capabilities, setCapabilities] = useState<XRCapabilities | null>(null);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<ARStartError | null>(null);
+  // AR can only start once the 3D stage (canvas + WebXR) is mounted; it loads at app start.
+  const stageReady = useStageStatus((state) => state.ready);
 
   useEffect(() => {
     let cancelled = false;
@@ -67,7 +70,7 @@ export function DeviceCheckScreen({ moduleId }: { moduleId: string }) {
           <h1 className="t-title">{t('deviceCheck.title')}</h1>
         </div>
 
-        {capabilities == null ? (
+        {capabilities == null || !stageReady ? (
           <p className="row t-muted" role="status">
             <LoaderCircle size={18} className="spin" />
             {t('deviceCheck.checking')}
@@ -87,9 +90,12 @@ export function DeviceCheckScreen({ moduleId }: { moduleId: string }) {
           </Notice>
         )}
 
-        <Notice tone="info" icon={<Info size={18} />}>
-          {t('deviceCheck.space')}
-        </Notice>
+        {/* Floor space only matters when the scene is placed in the room. */}
+        {arReady && (
+          <Notice tone="info" icon={<Info size={18} />}>
+            {t('deviceCheck.space')}
+          </Notice>
+        )}
 
         {error != null && (
           <Notice tone="critical" icon={<Camera size={18} />}>
@@ -99,7 +105,7 @@ export function DeviceCheckScreen({ moduleId }: { moduleId: string }) {
       </div>
 
       <footer className="screen-footer">
-        {arReady && (
+        {arReady && stageReady && (
           <Button
             size="lg"
             block
@@ -115,7 +121,7 @@ export function DeviceCheckScreen({ moduleId }: { moduleId: string }) {
           variant={arReady ? 'secondary' : 'primary'}
           block
           icon={<Box size={20} />}
-          disabled={capabilities == null || starting}
+          disabled={capabilities == null || !stageReady || starting}
           onClick={() => open('fallback3d')}
         >
           {t('deviceCheck.use3d')}

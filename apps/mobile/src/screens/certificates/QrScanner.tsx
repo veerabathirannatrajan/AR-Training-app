@@ -1,4 +1,4 @@
-import jsQR from 'jsqr';
+import type jsQRDecode from 'jsqr';
 import { useEffect, useRef } from 'react';
 
 export type ScanError = 'blocked' | 'unavailable';
@@ -15,9 +15,19 @@ declare global {
 
 const SCAN_INTERVAL_MS = 180;
 
+type JsQR = typeof jsQRDecode;
+let jsQRLoad: Promise<JsQR> | null = null;
+
+/** jsQR (~130 kB) is only fetched on phones without BarcodeDetector. */
+function loadJsQR(): Promise<JsQR> {
+  jsQRLoad ??= import('jsqr').then((module) => module.default);
+  return jsQRLoad;
+}
+
 /**
  * Live camera QR scanner. Uses the built-in BarcodeDetector where Chrome has it (Android) and
  * falls back to jsQR on a downscaled frame, so it also works in desktop browsers and WebViews.
+ * jsQR is loaded on demand: it is in the offline precache, just not in the startup bundle.
  */
 export function QrScanner({
   onResult,
@@ -64,7 +74,16 @@ export function QrScanner({
           detector = null; // fall back to jsQR from now on
         }
       }
-      if (text == null && context != null) {
+      // jsQR only where there is no (working) BarcodeDetector: never both on every frame.
+      if (detector == null && context != null) {
+        let jsQR: JsQR;
+        try {
+          jsQR = await loadJsQR();
+        } catch {
+          if (!stopped) onErrorRef.current('unavailable');
+          return;
+        }
+        if (stopped) return;
         const scale = Math.min(1, 720 / Math.max(video.videoWidth, video.videoHeight));
         canvas.width = Math.round(video.videoWidth * scale);
         canvas.height = Math.round(video.videoHeight * scale);

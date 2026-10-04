@@ -121,5 +121,27 @@ export default defineConfig({
   build: {
     target: 'es2022',
     sourcemap: true,
+    rolldownOptions: {
+      output: {
+        // Stable vendor chunks: an app update re-downloads only the app code, not three.js/React.
+        // The 3D chunk is only imported by the lazily loaded engine (see src/App.tsx).
+        codeSplitting: {
+          groups: [
+            {
+              // Higher priority: claims React (and Vite's preload helper, used by every lazy
+              // import) before the 3D group would pull them in as its dependencies.
+              name: 'vendor',
+              priority: 2,
+              test: /[\\/]node_modules[\\/](react|react-dom|scheduler|use-sync-external-store|@babel[\\/]runtime|react-i18next|i18next|dexie|dexie-react-hooks|zustand|lucide-react)[\\/]|vite[\\/]preload-helper/,
+            },
+            {
+              name: 'vendor-3d',
+              priority: 1,
+              test: /[\\/]node_modules[\\/](three|three-stdlib|meshline|@react-three|@pmndrs|its-fine|react-reconciler|react-use-measure|suspend-react|tunnel-rat)[\\/]/,
+            },
+          ],
+        },
+      },
+    },
   },
 });

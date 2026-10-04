@@ -1,28 +1,31 @@
-import { Canvas } from '@react-three/fiber';
-import { XR } from '@react-three/xr';
-import { useEffect } from 'react';
-import { startSyncEngine } from './data/sync';
+import { lazy, Suspense, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { installBackGuard, useCurrentRoute, type Route } from './app/navigation';
 import { useOrientationLock, type OrientationNeed } from './app/orientation';
-import { TrainingWorld } from './engine/TrainingWorld';
-import { useRunnerStore } from './engine/runner/runnerStore';
+import { startSyncEngine } from './data/sync';
+import { preloadEngine } from './engine/stageStatus';
 import { useBlockXRSelectOnUI } from './engine/xr/xrUi';
-import { useXRSession } from './engine/xr/useXRSession';
-import { xrStore } from './engine/xr/xrStore';
 import { overlayRoot } from './lib/overlayRoot';
 import { findModule } from './modules/registry';
 import { CertificateScreen } from './screens/CertificateScreen';
 import { CertificatesScreen } from './screens/CertificatesScreen';
-import { DeviceCheckScreen } from './screens/DeviceCheckScreen';
 import { DrillScreen } from './screens/DrillScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { LanguageScreen } from './screens/LanguageScreen';
 import { LoginScreen } from './screens/LoginScreen';
 import { ModuleIntroScreen } from './screens/ModuleIntroScreen';
 import { SplashScreen } from './screens/SplashScreen';
-import { TrainingScreen } from './screens/TrainingScreen';
 import { VerifyScreen } from './screens/VerifyScreen';
+
+// The training engine (three.js, WebXR, module scenes: most of the app's code) is split out so
+// the first screen opens fast; it loads in the background straight after (preloadEngine).
+const Stage = lazy(() => import('./engine/Stage'));
+const DeviceCheckScreen = lazy(() =>
+  import('./screens/DeviceCheckScreen').then((module) => ({ default: module.DeviceCheckScreen })),
+);
+const TrainingScreen = lazy(() =>
+  import('./screens/TrainingScreen').then((module) => ({ default: module.TrainingScreen })),
+);
 
 function Screen({ route }: { route: Route }) {
   switch (route.name) {
@@ -51,38 +54,6 @@ function Screen({ route }: { route: Route }) {
   }
 }
 
-/**
- * One canvas for the whole app, always mounted, so an AR session can be started straight
- * from a button tap. It only renders while a training module is open.
- */
-function Stage({ route }: { route: Route }) {
-  const sessionId = useRunnerStore((state) => state.sessionId);
-  const training = route.name === 'training' ? route : null;
-  const definition = training != null ? findModule(training.moduleId) : undefined;
-
-  return (
-    <Canvas
-      frameloop={training != null ? 'always' : 'never'}
-      dpr={[1, 1.5]}
-      flat
-      gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-      camera={{ fov: 60, near: 0.01, far: 60, position: [0, 1.6, 2.4] }}
-    >
-      <XR store={xrStore}>
-        {training != null && definition != null && sessionId != null && (
-          <TrainingWorld
-            key={`${training.mode}:${sessionId}`}
-            mode={training.mode}
-            fallbackView={definition.fallbackView}
-          >
-            <definition.Scene />
-          </TrainingWorld>
-        )}
-      </XR>
-    </Canvas>
-  );
-}
-
 /** App screens are portrait; a module chooses its orientation from the device check on. */
 function orientationFor(route: Route): OrientationNeed {
   if (route.name !== 'device-check' && route.name !== 'training') return 'portrait';
@@ -91,20 +62,24 @@ function orientationFor(route: Route): OrientationNeed {
 
 export function App() {
   const route = useCurrentRoute();
-  const xrSession = useXRSession();
 
   useOrientationLock(orientationFor(route));
   useBlockXRSelectOnUI(overlayRoot);
   useEffect(() => installBackGuard(), []);
   useEffect(() => startSyncEngine(), []);
-  useEffect(() => {
-    overlayRoot.classList.toggle('in-ar', xrSession != null);
-  }, [xrSession]);
+  useEffect(() => preloadEngine(), []);
 
   return (
     <>
-      <Stage route={route} />
-      {createPortal(<Screen route={route} />, overlayRoot)}
+      <Suspense fallback={null}>
+        <Stage route={route} />
+      </Suspense>
+      {createPortal(
+        <Suspense fallback={<main className="screen" aria-busy="true" />}>
+          <Screen route={route} />
+        </Suspense>,
+        overlayRoot,
+      )}
     </>
   );
 }

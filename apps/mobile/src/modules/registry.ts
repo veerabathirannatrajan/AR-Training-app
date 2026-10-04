@@ -5,17 +5,20 @@ import {
   type TrainingModuleContent,
 } from '@ar-training/shared';
 import { Flame, Hand, Wind, type LucideIcon } from 'lucide-react';
-import type { ComponentType } from 'react';
+import { lazy, type ComponentType } from 'react';
 import type { OrientationNeed } from '../app/orientation';
 import type { FallbackView } from '../engine/fallback/view';
 import type { HoldLabel } from '../engine/hud/controls';
-import { ArBasicsScene } from './ar-basics/ArBasicsScene';
 import { FireOverlay, FireTray } from './fire-explosion/FireHud';
-import { FireScene } from './fire-explosion/FireScene';
 import { FIRE_ILLUSTRATIONS } from './fire-explosion/illustrationMap';
 import { GasOverlay, GasTray } from './gas-confined-space/GasHud';
-import { GasScene } from './gas-confined-space/GasScene';
 import { GAS_ILLUSTRATIONS } from './gas-confined-space/illustrationMap';
+
+// 3D scenes load with the engine, after the first screen (see engine/stageStatus.ts).
+const scenes = () => import('./scenes');
+const ArBasicsScene = lazy(() => scenes().then((module) => ({ default: module.ArBasicsScene })));
+const FireScene = lazy(() => scenes().then((module) => ({ default: module.FireScene })));
+const GasScene = lazy(() => scenes().then((module) => ({ default: module.GasScene })));
 
 /** HUD controls a step needs besides the instruction card. */
 export interface StepUi {
