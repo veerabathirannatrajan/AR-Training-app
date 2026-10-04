@@ -65,7 +65,7 @@ export const hi: Messages = {
     loading: 'लोड हो रहा है…',
     error: 'यह जानकारी लोड नहीं हो सकी।',
     apiDown:
-      '{{url}} पर API से संपर्क नहीं हो सका। `npm run dev:api` से इसे चालू करें (फ़ोन पर `adb reverse tcp:8000 tcp:8000` भी)।',
+      '{{url}} पर API से संपर्क नहीं हो सका। इंटरनेट कनेक्शन जाँचें। लैपटॉप API के लिए: `npm run dev:api` से इसे चालू करें (फ़ोन के लिए `adb reverse tcp:8000 tcp:8000` भी)।',
     empty: 'इन फ़िल्टर के लिए कुछ नहीं मिला।',
     showing: '{{total}} में से {{count}} दिखाए गए',
     yes: 'हाँ',
@@ -87,7 +87,7 @@ export const hi: Messages = {
     demo: 'डेमो खाता: admin@test.com / admin1234',
     server: 'API सर्वर',
     serverHint:
-      'लैपटॉप: http://localhost:8000। फ़ोन ऐप: यही पता adb reverse से लैपटॉप तक पहुँचता है।',
+      'डिफ़ॉल्ट: {{url}}। लैपटॉप API: http://localhost:8000 (फ़ोन इसे adb reverse से पाता है)।',
     serverSaved: 'सर्वर का पता सहेजा गया।',
   },
   dashboard: {

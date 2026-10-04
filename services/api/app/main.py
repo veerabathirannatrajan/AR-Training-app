@@ -1,10 +1,12 @@
 import logging
 import os
-from collections.abc import AsyncIterator
+import threading
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Request, Response, status
+from fastapi.concurrency import run_in_threadpool
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,13 +34,18 @@ DEV_ORIGINS = [
 ]
 # The admin Android app (Capacitor) serves the portal from inside the APK at http://localhost.
 NATIVE_APP_ORIGINS = ["http://localhost", "https://localhost"]
-# The Android app (TWA) loads the deployed web app from Vercel and, during development, reaches
-# this API on the laptop as http://localhost:8000 through `adb reverse`.
+# The Android app (TWA) loads the deployed web app from Vercel and calls the hosted API (or, in
+# development, this API on the laptop as http://localhost:8000 through `adb reverse`).
 DEPLOYED_ORIGIN_REGEX = r"https://ar-mining-training(-[a-z0-9-]+)?\.vercel\.app"
 
 
-@asynccontextmanager
-async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+_prepared = False
+_prepare_lock = threading.Lock()
+
+
+def prepare() -> None:
+    """Creates missing tables, the signing key and the portal admin; seeds an empty database."""
+    global _prepared
     init_db()
     signing_key()  # create the certificate signing key on first start
     with SessionLocal() as session:
@@ -53,6 +60,18 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
                 results = seed_history(session)
                 if results:
                     log.info("Seeded %d demo training results with certificates.", results)
+    _prepared = True
+
+
+def _prepare_once() -> None:
+    with _prepare_lock:
+        if not _prepared:
+            prepare()
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    prepare()
     yield
 
 
@@ -69,6 +88,18 @@ app.add_middleware(
     # Lets the portal read the export file name (CSV / PDF downloads).
     expose_headers=["Content-Disposition"],
 )
+
+
+@app.middleware("http")
+async def ensure_prepared(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    """Serverless hosts may skip the lifespan startup: prepare on the first request instead."""
+    if not _prepared:
+        await run_in_threadpool(_prepare_once)
+    return await call_next(request)
+
+
 app.include_router(auth.router)
 app.include_router(sync.router)
 app.include_router(certificates.router)

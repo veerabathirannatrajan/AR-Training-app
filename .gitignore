@@ -39,6 +39,8 @@ apps/android/keys/
 # Generated: Android project (from apps/android/twa-manifest.json), Vercel build output
 apps/android/twa/
 .vercel/
+# Generated: hosted API bundle (npm run deploy:api)
+services/api/.deploy/
 
 .pytest_cache/
 translations/

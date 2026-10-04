@@ -35,6 +35,7 @@ step(VENV_PYTHON, [
   'install',
   '--disable-pip-version-check',
   '-r',
-  path.join(API_DIR, 'requirements.txt'),
+  // Runtime + test dependencies (the hosted API installs only requirements.txt).
+  path.join(API_DIR, 'requirements-dev.txt'),
 ]);
 console.log('\n✔ API environment ready. Start it with `npm run dev:api`.');

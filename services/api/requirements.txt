@@ -1,12 +1,11 @@
+# Runtime dependencies (also what the hosted API on Vercel installs). Tests: requirements-dev.txt
 fastapi>=0.142,<1
 uvicorn[standard]>=0.54,<1
 sqlalchemy>=2.0,<3
+# Postgres driver for the hosted database (Neon); local development uses SQLite
+psycopg[binary]>=3.2,<4
 pyjwt>=2.10,<3
 pynacl>=1.5,<2
 reportlab>=4,<6
 # Polygon Amoy anchoring (only used when ARMT_POLYGON_PRIVATE_KEY is set)
 eth-account>=0.13,<1
-
-# Tests
-pytest>=8,<10
-httpx2>=2.13,<3

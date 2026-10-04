@@ -35,7 +35,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useLocale } from '@/i18n';
-import { ApiError, apiBase, setApiBase } from '@/lib/api';
+import { ApiError, apiBase, DEFAULT_API, setApiBase } from '@/lib/api';
 import {
   useAdmins,
   useAppSettings,
@@ -506,7 +506,7 @@ function ServerCard() {
     <Card>
       <CardHeader>
         <CardTitle>{t('settings.server')}</CardTitle>
-        <CardDescription>{t('login.serverHint')}</CardDescription>
+        <CardDescription>{t('login.serverHint', { url: DEFAULT_API })}</CardDescription>
       </CardHeader>
       <CardContent>
         <form

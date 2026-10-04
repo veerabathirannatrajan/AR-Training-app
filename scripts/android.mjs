@@ -11,6 +11,10 @@
  * (so WebXR AR keeps working). Chrome hides its address bar only when the site's
  * /.well-known/assetlinks.json names this app's signing key, which this script keeps in sync.
  *
+ * The web app is built against the hosted API (services/api/vercel/deployment.json, written by
+ * `npm run deploy:api`), so the installed app needs no laptop. Without a hosted API it falls back
+ * to the laptop's API at http://localhost:8000 through `adb reverse` (USB cable).
+ *
  * First run: creates the signing key in apps/android/keys/ (gitignored; back it up — updates must
  * be signed with the same key) and links apps/mobile to the Vercel project `ar-mining-training`
  * (run `npx vercel login` first if asked).
@@ -19,7 +23,6 @@
  *      ANDROID_HOME=<Android SDK>  ADB=<path to adb>  ANDROID_SERIAL=<device serial>
  */
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { connectPhone, fail, isListening, reversePorts } from './lib/adb.mjs';
@@ -38,6 +41,13 @@ import {
   step,
   versionCode,
 } from './lib/android-build.mjs';
+import {
+  deployProduction,
+  ensureVercelLogin,
+  hostedApiUrl,
+  productionHost,
+  vercel,
+} from './lib/vercel.mjs';
 
 const MOBILE = path.join(ROOT, 'apps', 'mobile');
 const ANDROID = path.join(ROOT, 'apps', 'android');
@@ -45,9 +55,9 @@ const TWA_MANIFEST = path.join(ANDROID, 'twa-manifest.json');
 const PROJECT = path.join(ANDROID, 'twa');
 const APK = path.join(ANDROID, 'dist', 'ar-mining-training.apk');
 const ASSET_LINKS = path.join(MOBILE, 'public', '.well-known', 'assetlinks.json');
-const VERCEL = 'vercel@62';
 const VERCEL_PROJECT = 'ar-mining-training';
 const API_PORT = 8000;
+const LOCAL_API = `http://localhost:${API_PORT}`;
 
 const deploy = !process.argv.includes('--no-deploy');
 const install = !process.argv.includes('--no-install');
@@ -125,48 +135,13 @@ function writeVercelOutput() {
 }
 
 function deployToVercel() {
-  const npx = (args, options = {}) =>
-    exec('npx', ['--yes', VERCEL, ...args], { cwd: MOBILE, shell: true, ...options });
-  const whoami = spawnSync(`npx --yes ${VERCEL} whoami`, {
-    cwd: MOBILE,
-    shell: true,
-    encoding: 'utf8',
-  });
-  if (whoami.status !== 0) {
-    fail('Not logged in to Vercel.', [
-      'Run `npx vercel login` and approve the login in your browser.',
-      'Run `npm run android` again.',
-    ]);
-  }
+  ensureVercelLogin(MOBILE, 'npm run android');
   if (!existsSync(path.join(MOBILE, '.vercel', 'project.json'))) {
     step(`Linking apps/mobile to the Vercel project "${VERCEL_PROJECT}"`);
-    npx(['link', '--yes', '--project', VERCEL_PROJECT]);
+    vercel(['link', '--yes', '--project', VERCEL_PROJECT], { cwd: MOBILE });
   }
   writeVercelOutput();
-  const stdout = npx(['deploy', '--prebuilt', '--prod', '--yes', '--format', 'json'], {
-    capture: true,
-  });
-  const json = stdout.slice(stdout.indexOf('{'));
-  let deployment;
-  try {
-    deployment = JSON.parse(json);
-  } catch {
-    fail('Could not read the Vercel deploy result.', [stdout.trim()]);
-  }
-  return deployment;
-}
-
-/** The stable production domain (the Android app is tied to it). */
-function productionHost(deployment) {
-  const aliases = [deployment.alias, deployment.aliases, deployment.deployment?.alias]
-    .flat()
-    .filter((alias) => typeof alias === 'string')
-    .map((alias) => alias.replace(/^https?:\/\//, ''));
-  return (
-    aliases.find((alias) => alias === `${VERCEL_PROJECT}.vercel.app`) ??
-    aliases.find((alias) => alias.endsWith('.vercel.app')) ??
-    `${VERCEL_PROJECT}.vercel.app`
-  );
+  return deployProduction(MOBILE, ['--prebuilt']);
 }
 
 async function checkAssetLinks(host, expected) {
@@ -213,11 +188,11 @@ function buildApk({ jdk, sdk, signing }) {
   });
 }
 
-function installOnPhone(packageId) {
+function installOnPhone(packageId, apiUrl) {
   const { adb } = connectPhone('npm run android');
   installApk(adb, APK, packageId);
-  // The app's login API runs on this laptop; the phone reaches it as http://localhost:8000.
-  reversePorts(adb, [API_PORT]);
+  // Without a hosted API the app's API runs on this laptop, reached as http://localhost:8000.
+  if (apiUrl === LOCAL_API) reversePorts(adb, [API_PORT]);
   adb(['shell', 'am', 'force-stop', packageId]);
   const launch = adb(['shell', 'am', 'start', '-n', `${packageId}/.LauncherActivity`]);
   if (!launch.ok || /Error/.test(launch.output)) fail('Could not start the app.', [launch.output]);
@@ -243,20 +218,29 @@ if (!existsSync(ASSET_LINKS) || readFileSync(ASSET_LINKS, 'utf8') !== statement)
   console.log(`• Updated ${path.relative(ROOT, ASSET_LINKS)} (commit it)`);
 }
 
+const apiUrl = hostedApiUrl() ?? LOCAL_API;
 if (deploy) {
-  step('Building the web app');
-  exec('npm', ['run', 'build', '-w', '@ar-training/mobile'], { shell: true });
+  step(`Building the web app (API: ${apiUrl})`);
+  if (apiUrl === LOCAL_API) {
+    console.warn(
+      '! No hosted API yet (`npm run deploy:api`): the app will need the laptop API over USB.',
+    );
+  }
+  exec('npm', ['run', 'build', '-w', '@ar-training/mobile'], {
+    shell: true,
+    env: { ...process.env, VITE_API_BASE_URL: apiUrl },
+  });
   step('Deploying to Vercel (production)');
-  const host = productionHost(deployToVercel());
+  const host = productionHost(deployToVercel(), VERCEL_PROJECT);
   console.log(`• Live at https://${host}`);
   if (host !== manifest.host) {
     // The Android app is tied to one domain: keep twa-manifest.json pointing at it.
-    const json = JSON.parse(readFileSync(TWA_MANIFEST, 'utf8'));
-    json.host = host;
-    json.iconUrl = `https://${host}/pwa-512x512.png`;
-    json.maskableIconUrl = `https://${host}/maskable-icon-512x512.png`;
-    writeFileSync(TWA_MANIFEST, `${JSON.stringify(json, null, 2)}\n`);
-    Object.assign(manifest, { host, iconUrl: json.iconUrl, maskableIconUrl: json.maskableIconUrl });
+    // Host, icon and shortcut URLs all move to the new domain.
+    const json = readFileSync(TWA_MANIFEST, 'utf8')
+      .replaceAll(`https://${manifest.host}/`, `https://${host}/`)
+      .replace(`"host": "${manifest.host}"`, `"host": "${host}"`);
+    writeFileSync(TWA_MANIFEST, json);
+    Object.assign(manifest, await bubblewrap.TwaManifest.fromFile(TWA_MANIFEST));
     console.log(`• Updated ${path.relative(ROOT, TWA_MANIFEST)} host → ${host} (commit it)`);
   }
 }
@@ -274,8 +258,8 @@ console.log(`• Signed APK: ${path.relative(ROOT, APK)}`);
 
 if (install) {
   step('Installing on the phone');
-  installOnPhone(manifest.packageId);
-  if (!(await isListening(API_PORT))) {
+  installOnPhone(manifest.packageId, apiUrl);
+  if (apiUrl === LOCAL_API && !(await isListening(API_PORT))) {
     console.warn(
       '! The API is not running: first login on the phone needs `npm run dev:api` on this laptop.',
     );

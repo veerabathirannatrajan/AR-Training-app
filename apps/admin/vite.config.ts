@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 
-export const APP_VERSION = '0.4.0';
+export const APP_VERSION = '1.0.0';
 
 // Admin compliance portal. Dev on :5174, `vite preview` on :4174. The same build is packaged in
 // the admin Android app (Capacitor), so asset paths are relative.

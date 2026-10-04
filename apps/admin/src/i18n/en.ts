@@ -64,7 +64,7 @@ export const en = {
     loading: 'Loading…',
     error: 'Could not load this data.',
     apiDown:
-      'Cannot reach the API at {{url}}. Start it with `npm run dev:api` (and `adb reverse tcp:8000 tcp:8000` on the phone).',
+      'Cannot reach the API at {{url}}. Check the internet connection. For the laptop API: start it with `npm run dev:api` (and `adb reverse tcp:8000 tcp:8000` for a phone).',
     empty: 'Nothing to show for these filters.',
     showing: 'Showing {{count}} of {{total}}',
     yes: 'Yes',
@@ -86,7 +86,7 @@ export const en = {
     demo: 'Demo account: admin@test.com / admin1234',
     server: 'API server',
     serverHint:
-      'Laptop: http://localhost:8000. Phone app: the same address reaches the laptop through adb reverse.',
+      'Default: {{url}}. Laptop API: http://localhost:8000 (a phone reaches it through adb reverse).',
     serverSaved: 'Server address saved.',
   },
   dashboard: {

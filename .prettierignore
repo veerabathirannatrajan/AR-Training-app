@@ -7,3 +7,7 @@ PROJECT_BRIEF.md
 services/api/.pytest_cache
 apps/admin/android
 apps/android/twa
+# Generated: knowledge graph (graphify), Digital Asset Links (written by npm run android)
+graphify-out
+apps/mobile/public/.well-known
+services/api/.deploy

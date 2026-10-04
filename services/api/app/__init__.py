@@ -1,3 +1,3 @@
 """AR Mining Training App – API service."""
 
-__version__ = "0.4.0"
+__version__ = "1.0.0"

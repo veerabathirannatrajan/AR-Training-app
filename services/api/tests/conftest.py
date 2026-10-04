@@ -5,9 +5,12 @@ from pathlib import Path
 
 import pytest
 
-# Settings are read at import time, so point the app at a throwaway database first.
+# Settings are read at import time, so point the app at a throwaway database first: SQLite, or
+# an empty Postgres database from ARMT_TEST_DATABASE_URL (its tables are dropped between tests).
 _TMP = Path(tempfile.mkdtemp(prefix="armt-test-"))
-os.environ["ARMT_DATABASE_URL"] = f"sqlite:///{_TMP / 'test.db'}"
+os.environ["ARMT_DATABASE_URL"] = (
+    os.environ.get("ARMT_TEST_DATABASE_URL") or f"sqlite:///{_TMP / 'test.db'}"
+)
 os.environ["ARMT_JWT_SECRET"] = "test-secret-not-for-production-use-0123456789"
 os.environ["ARMT_SEED_DEMO"] = "1"
 # Generated training history is opt-in per test (see the `history_client` fixture).

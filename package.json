@@ -28,6 +28,7 @@
     "test:api": "node scripts/test-api.mjs",
     "android": "node scripts/android.mjs",
     "android:admin": "node scripts/android-admin.mjs",
+    "deploy:api": "node scripts/deploy-api.mjs",
     "app": "npm run build -w @ar-training/mobile && npm run preview -w @ar-training/mobile",
     "admin:app": "npm run build -w @ar-training/admin && npm run preview -w @ar-training/admin",
     "phone:app": "node scripts/phone.mjs --open --app",

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "regions": ["sin1"],
+  "functions": {
+    "api/index.py": {
+      "memory": 1024,
+      "maxDuration": 60,
+      "excludeFiles": "{.vercel/**,.env*,**/__pycache__/**,**/*.pyc}"
+    }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
+}

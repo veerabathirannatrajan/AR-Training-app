@@ -27,6 +27,11 @@ export function apiBase(): string {
   return (read(API_KEY) ?? DEFAULT_API).replace(/\/+$/, '');
 }
 
+/** A development API on this computer (or the laptop, through adb reverse). */
+export function isLocalApi(url: string = apiBase()): boolean {
+  return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/|$)/.test(url);
+}
+
 export function setApiBase(url: string): void {
   write(API_KEY, url.trim() === '' || url.trim() === DEFAULT_API ? null : url.trim());
 }

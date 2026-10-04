@@ -13,7 +13,7 @@ from typing import Any
 from nacl.exceptions import BadSignatureError
 from nacl.signing import SigningKey, VerifyKey
 
-from app.config import KEYS_DIR, settings
+from app.config import HOSTED, KEYS_DIR, settings
 
 CERT_FORMAT_VERSION = 1
 PRIVATE_KEY_FILE = KEYS_DIR / "cert_signing_ed25519.key"
@@ -69,6 +69,10 @@ def signing_key() -> SigningKey:
     """The server's signing key: ARMT_CERT_SIGNING_KEY, else keys/ (created on first use)."""
     if settings.cert_signing_key:
         return SigningKey(bytes.fromhex(settings.cert_signing_key))
+    if HOSTED:
+        # A key generated on a read-only, per-instance file system would be lost on the next
+        # cold start, and with it every signature. deploy:api sets the laptop's key instead.
+        raise RuntimeError("ARMT_CERT_SIGNING_KEY must be set for the hosted API.")
     if PRIVATE_KEY_FILE.exists():
         key = SigningKey(bytes.fromhex(PRIVATE_KEY_FILE.read_text(encoding="utf-8").strip()))
     else:

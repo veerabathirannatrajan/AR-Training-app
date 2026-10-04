@@ -6,7 +6,7 @@ import { ErrorState } from '@/components/states';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input, Label } from '@/components/ui/misc';
-import { ApiError, apiBase, NetworkError, setApiBase } from '@/lib/api';
+import { ApiError, apiBase, DEFAULT_API, isLocalApi, NetworkError, setApiBase } from '@/lib/api';
 import { useSession } from '@/lib/session';
 
 export function LoginPage() {
@@ -106,7 +106,10 @@ export function LoginPage() {
               {busy && <Loader2 className="animate-spin" />}
               {busy ? t('login.signingIn') : t('login.submit')}
             </Button>
-            <p className="text-center text-xs text-muted-foreground">{t('login.demo')}</p>
+            {/* The demo password only applies to a laptop API; the hosted one has its own. */}
+            {isLocalApi() && (
+              <p className="text-center text-xs text-muted-foreground">{t('login.demo')}</p>
+            )}
           </form>
         </CardContent>
       </Card>
@@ -133,7 +136,7 @@ export function LoginPage() {
                 {t('actions.save')}
               </Button>
             </div>
-            <p>{t('login.serverHint')}</p>
+            <p>{t('login.serverHint', { url: DEFAULT_API })}</p>
           </form>
         ) : (
           <button
