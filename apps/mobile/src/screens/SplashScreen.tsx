@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { takeCertificateLink, useNavigation } from '../app/navigation';
+import { takeCertificateLink, takeLaunchShortcut, useNavigation } from '../app/navigation';
 import { useSession } from '../app/session';
 import { currentWorker } from '../data/auth';
 import { AppMark } from '../design/AppMark';
@@ -25,13 +25,17 @@ export function SplashScreen() {
       ]);
       if (cancelled) return;
       const { reset, navigate } = useNavigation.getState();
+      const shortcut = takeLaunchShortcut();
       if (storedLanguage() == null) {
         reset({ name: 'language', next: 'login' });
       } else if (worker == null) {
         reset({ name: 'login' });
+        // Anyone can verify a certificate without logging in (e.g. a supervisor at the gate).
+        if (shortcut === 'verify') navigate({ name: 'verify' });
       } else {
         useSession.getState().setWorker(worker);
         reset({ name: 'home' });
+        if (shortcut != null) navigate({ name: shortcut });
       }
       const certificateLink = takeCertificateLink();
       if (certificateLink != null) navigate({ name: 'verify', payload: certificateLink });
@@ -48,7 +52,7 @@ export function SplashScreen() {
         <AppMark size={112} />
         <h1 className="t-display">{t('appName')}</h1>
         <p className="t-muted">{t('tagline')}</p>
-        <span className="spinner" role="progressbar" aria-label="Loading" />
+        <span className="spinner" role="progressbar" aria-label={t('loading')} />
       </div>
     </main>
   );

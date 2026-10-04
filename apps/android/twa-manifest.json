@@ -23,7 +23,22 @@
   },
   "appVersionCode": 1,
   "appVersion": "1.0.0",
-  "shortcuts": [],
+  "shortcuts": [
+    {
+      "name": "Verify a certificate",
+      "shortName": "Verify",
+      "url": "https://ar-mining-training.vercel.app/?open=verify",
+      "chosenIconUrl": "https://ar-mining-training.vercel.app/shortcuts/verify-192.png",
+      "chosenMaskableIconUrl": "https://ar-mining-training.vercel.app/shortcuts/verify-192.png"
+    },
+    {
+      "name": "My certificates",
+      "shortName": "Certificates",
+      "url": "https://ar-mining-training.vercel.app/?open=certificates",
+      "chosenIconUrl": "https://ar-mining-training.vercel.app/shortcuts/certificates-192.png",
+      "chosenMaskableIconUrl": "https://ar-mining-training.vercel.app/shortcuts/certificates-192.png"
+    }
+  ],
   "generatorApp": "@bubblewrap/core",
   "fallbackType": "customtabs",
   "enableSiteSettingsShortcut": true,

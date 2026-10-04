@@ -88,6 +88,23 @@ export function takeCertificateLink(): string | null {
   return hash;
 }
 
+export type LaunchShortcut = 'verify' | 'certificates';
+
+/** Home-screen shortcut the app was opened with (…/?open=verify); cleared once read. */
+export function takeLaunchShortcut(): LaunchShortcut | null {
+  const params = new URLSearchParams(window.location.search);
+  const open = params.get('open');
+  if (open == null) return null;
+  params.delete('open');
+  const search = params.toString();
+  window.history.replaceState(
+    window.history.state,
+    '',
+    window.location.pathname + (search === '' ? '' : `?${search}`) + window.location.hash,
+  );
+  return open === 'verify' || open === 'certificates' ? open : null;
+}
+
 export function installBackGuard(): () => void {
   const onPopState = () => {
     // A certificate link opened while the app is running is a navigation, not a back press.

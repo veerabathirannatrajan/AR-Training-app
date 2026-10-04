@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig, type Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-const APP_VERSION = '0.4.0';
+const APP_VERSION = '1.0.0';
 const CERT_PUBLIC_KEY_FILE = fileURLToPath(
   new URL('../../services/api/keys/cert_signing_ed25519.pub', import.meta.url),
 );
@@ -81,6 +81,21 @@ export default defineConfig({
         background_color: '#11151c',
         theme_color: '#11151c',
         categories: ['education', 'productivity'],
+        // Long-press the app icon (the Android app gets the same, see apps/android/twa-manifest.json).
+        shortcuts: [
+          {
+            name: 'Verify a certificate',
+            short_name: 'Verify',
+            url: '/?open=verify',
+            icons: [{ src: 'shortcuts/verify-192.png', sizes: '192x192', type: 'image/png' }],
+          },
+          {
+            name: 'My certificates',
+            short_name: 'Certificates',
+            url: '/?open=certificates',
+            icons: [{ src: 'shortcuts/certificates-192.png', sizes: '192x192', type: 'image/png' }],
+          },
+        ],
         icons: [
           { src: 'pwa-64x64.png', sizes: '64x64', type: 'image/png' },
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },

@@ -1,6 +1,7 @@
 {
   "appName": "AR Mining Training",
   "tagline": "Safety training for mining, steel and mica workers",
+  "loading": "Loading",
   "actions": {
     "continue": "Continue",
     "back": "Back",
