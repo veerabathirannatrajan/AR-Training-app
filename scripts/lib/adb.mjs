@@ -35,7 +35,7 @@ function adbCandidates() {
   return candidates;
 }
 
-function findAdb() {
+export function findAdb() {
   for (const candidate of adbCandidates()) {
     if (candidate !== 'adb' && !existsSync(candidate)) continue;
     const result = spawnSync(candidate, ['version'], { encoding: 'utf8' });
@@ -137,6 +137,38 @@ export function reversePorts(adb, ports) {
     if (!ok) fail(`adb reverse for port ${port} failed`, [output]);
     console.log(`• Reversed phone localhost:${port} → laptop localhost:${port}`);
   }
+}
+
+/**
+ * Keeps `adb reverse` set up for every connected device while the caller runs. The tunnel is
+ * lost whenever the USB connection resets (cable moved, USB mode changed, phone rebooted); this
+ * puts it back within a few seconds. Does nothing when adb is not installed. Returns a stop
+ * function.
+ */
+export function keepReversed(ports, { intervalMs = 3000, log = console.log } = {}) {
+  const adbPath = findAdb();
+  if (adbPath == null) return () => {};
+  const check = () => {
+    const devices = run(adbPath, ['devices']);
+    if (!devices.ok) return;
+    const serials = devices.output
+      .split(/\r?\n/)
+      .map((line) => line.trim().split(/\s+/))
+      .filter(([serial, state]) => serial && state === 'device')
+      .map(([serial]) => serial);
+    for (const serial of serials) {
+      const { output } = run(adbPath, ['-s', serial, 'reverse', '--list']);
+      for (const port of ports) {
+        if (output.includes(`tcp:${port} tcp:${port}`)) continue;
+        if (run(adbPath, ['-s', serial, 'reverse', `tcp:${port}`, `tcp:${port}`]).ok) {
+          log(`• Phone ${serial}: localhost:${port} → this laptop (adb reverse)`);
+        }
+      }
+    }
+  };
+  check();
+  const timer = setInterval(check, intervalMs);
+  return () => clearInterval(timer);
 }
 
 export async function isListening(port) {
