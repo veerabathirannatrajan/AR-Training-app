@@ -36,5 +36,43 @@
     "installHint": "ऐप इंस्टॉल करें ताकि आप इसे होम स्क्रीन से खोल सकें और बिना इंटरनेट के इस्तेमाल कर सकें।"
   },
   "minutes_one": "{{count}} मिनट",
-  "minutes_other": "{{count}} मिनट"
+  "minutes_other": "{{count}} मिनट",
+  "worker": {
+    "roles": {
+      "Miner": "खनिक",
+      "Shot-firer": "शॉट फ़ायरर",
+      "Dumper operator": "डंपर ऑपरेटर",
+      "Electrician": "इलेक्ट्रीशियन",
+      "Fitter": "फ़िटर",
+      "Loader": "लोडर",
+      "Pump operator": "पंप ऑपरेटर",
+      "Helper": "हेल्पर",
+      "Furnace operator": "भट्ठी ऑपरेटर",
+      "Crane operator": "क्रेन ऑपरेटर",
+      "Rigger": "रिगर",
+      "Welder": "वेल्डर",
+      "Gas cutter": "गैस कटर",
+      "Mica cutter": "अभ्रक कटर",
+      "Sorter": "छँटाई कामगार",
+      "Driller": "ड्रिलर",
+      "Splitter": "अभ्रक स्प्लिटर",
+      "Machine operator": "मशीन ऑपरेटर",
+      "Packer": "पैकर",
+      "Mining sirdar": "माइनिंग सरदार",
+      "Shift supervisor": "शिफ़्ट सुपरवाइज़र",
+      "Site supervisor": "साइट सुपरवाइज़र"
+    },
+    "sectors": {
+      "coal": "कोयला",
+      "steel": "इस्पात",
+      "mica": "अभ्रक"
+    },
+    "districts": {
+      "Dhanbad": "धनबाद",
+      "Bokaro": "बोकारो",
+      "Ranchi": "रांची",
+      "Koderma": "कोडरमा"
+    },
+    "siteName": "{{district}} {{sector}} साइट"
+  }
 }

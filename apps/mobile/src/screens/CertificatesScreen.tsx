@@ -67,7 +67,8 @@ export function CertificatesScreen() {
                       {title?.text ?? certificate.moduleId}
                     </span>
                     <span className="t-small t-muted t-num">
-                      {certificate.id} · {t('validUntil')} {formatCertDate(certificate.expiresOn)}
+                      {certificate.id} ·{' '}
+                      {t('validUntilDate', { date: formatCertDate(certificate.expiresOn) })}
                     </span>
                     <span>
                       <Chip tone={STATE_TONE[state]} icon={<StateIcon state={state} />}>

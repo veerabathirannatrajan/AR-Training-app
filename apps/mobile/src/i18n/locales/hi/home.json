@@ -13,7 +13,7 @@
     "passed": "पास",
     "failed": "पास नहीं"
   },
-  "bestScore": "सबसे अच्छा स्कोर {{score}}%",
+  "bestScore": "सबसे अच्छे अंक {{score}}%",
   "attempts_one": "{{count}} प्रयास",
   "attempts_other": "{{count}} प्रयास",
   "practiceOnly": "केवल अभ्यास, प्रमाणपत्र नहीं",

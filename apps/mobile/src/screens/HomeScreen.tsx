@@ -1,3 +1,4 @@
+import { formatCertDate } from '@ar-training/shared';
 import {
   Award,
   BellRing,
@@ -38,6 +39,7 @@ import {
 import { LowPolyBackdrop } from '../design/LowPolyBackdrop';
 import { XR_UI_PROPS } from '../engine/xr/xrUi';
 import { useLocalized } from '../i18n/localized';
+import { workerText } from '../i18n/workerText';
 import { MODULES, type ModuleDefinition } from '../modules/registry';
 import { StateIcon } from './certificates/CertificateCard';
 import { STATE_TONE } from './certificates/stateTone';
@@ -89,14 +91,29 @@ function ModuleCard({
   const title = localize(content.title);
   const summary = localize(content.summary);
 
+  // A live certificate means the module was passed, even if that happened on another phone
+  // (results stay on the phone that ran them; certificates follow the worker).
+  const certified =
+    certState === 'valid' || certState === 'expiring' || certState === 'provisional';
+  const status: ModuleProgress['status'] =
+    certified && (progress.status === 'not-started' || progress.status === 'in-progress')
+      ? 'passed'
+      : progress.status;
   const statusLabel = {
     'not-started': t('status.notStarted'),
     'in-progress': t('status.inProgress'),
     completed: t('status.completed'),
     passed: t('status.passed'),
     failed: t('status.failed'),
-  }[progress.status];
-  const done = progress.status === 'completed' || progress.status === 'passed';
+  }[status];
+  const done = status === 'completed' || status === 'passed';
+  const footer = [
+    content.kind === 'tutorial' ? t('practiceOnly') : null,
+    progress.bestPercent != null ? t('bestScore', { score: progress.bestPercent }) : null,
+    progress.bestPercent == null && certificate != null && certified
+      ? t('certificates:validUntilDate', { date: formatCertDate(certificate.expiresOn) })
+      : null,
+  ].filter((part) => part != null);
 
   return (
     <button
@@ -129,11 +146,11 @@ function ModuleCard({
         <Chip tone="accent">{t(`kind.${content.kind}`)}</Chip>
         <Chip>{t('common:minutes', { count: content.estimatedMinutes })}</Chip>
         <Chip
-          tone={STATUS_TONE[progress.status]}
+          tone={STATUS_TONE[status]}
           icon={
             done ? (
               <CircleCheck size={16} />
-            ) : progress.status === 'failed' ? (
+            ) : status === 'failed' ? (
               <CircleX size={16} />
             ) : undefined
           }
@@ -146,14 +163,9 @@ function ModuleCard({
           </Chip>
         )}
       </div>
-      <ProgressBar value={STATUS_PROGRESS[progress.status]} tone={done ? 'ok' : 'accent'} />
+      <ProgressBar value={STATUS_PROGRESS[status]} tone={done ? 'ok' : 'accent'} />
       <div className="row-between t-small t-muted">
-        <span>
-          {content.kind === 'tutorial' ? t('practiceOnly') : ''}
-          {progress.bestPercent != null
-            ? ` · ${t('bestScore', { score: progress.bestPercent })}`
-            : ''}
-        </span>
+        <span>{footer.join(' · ')}</span>
         <span className="t-num">
           {progress.attempts > 0 ? t('attempts', { count: progress.attempts }) : ''}
         </span>
@@ -164,7 +176,7 @@ function ModuleCard({
 }
 
 export function HomeScreen() {
-  const { t } = useTranslation(['home', 'common', 'certificates']);
+  const { t, i18n } = useTranslation(['home', 'common', 'certificates']);
   const worker = useSession((state) => state.worker);
   const progress = useModuleProgress(worker?.workerId ?? null);
   const online = useOnline();
@@ -178,6 +190,7 @@ export function HomeScreen() {
 
   if (worker == null) return null;
   const firstName = worker.name.split(' ')[0] ?? worker.name;
+  const place = workerText(i18n, worker);
 
   const onLogout = async () => {
     await logout();
@@ -196,7 +209,7 @@ export function HomeScreen() {
           <div className="grow">
             <h1 className="t-title">{t('greeting', { name: firstName })}</h1>
             <p className="t-small t-muted">
-              {t('workerMeta', { role: worker.role, site: worker.siteName })} ·{' '}
+              {t('workerMeta', { role: place.role, site: place.site })} ·{' '}
               <span className="t-num">{worker.workerId}</span>
             </p>
           </div>

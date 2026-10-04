@@ -36,5 +36,43 @@
     "installHint": "Install the app to open it from your home screen and use it without internet."
   },
   "minutes_one": "{{count}} min",
-  "minutes_other": "{{count}} min"
+  "minutes_other": "{{count}} min",
+  "worker": {
+    "roles": {
+      "Miner": "Miner",
+      "Shot-firer": "Shot-firer",
+      "Dumper operator": "Dumper operator",
+      "Electrician": "Electrician",
+      "Fitter": "Fitter",
+      "Loader": "Loader",
+      "Pump operator": "Pump operator",
+      "Helper": "Helper",
+      "Furnace operator": "Furnace operator",
+      "Crane operator": "Crane operator",
+      "Rigger": "Rigger",
+      "Welder": "Welder",
+      "Gas cutter": "Gas cutter",
+      "Mica cutter": "Mica cutter",
+      "Sorter": "Sorter",
+      "Driller": "Driller",
+      "Splitter": "Splitter",
+      "Machine operator": "Machine operator",
+      "Packer": "Packer",
+      "Mining sirdar": "Mining sirdar",
+      "Shift supervisor": "Shift supervisor",
+      "Site supervisor": "Site supervisor"
+    },
+    "sectors": {
+      "coal": "Coal",
+      "steel": "Steel",
+      "mica": "Mica"
+    },
+    "districts": {
+      "Dhanbad": "Dhanbad",
+      "Bokaro": "Bokaro",
+      "Ranchi": "Ranchi",
+      "Koderma": "Koderma"
+    },
+    "siteName": "{{district}} {{sector}} Site"
+  }
 }

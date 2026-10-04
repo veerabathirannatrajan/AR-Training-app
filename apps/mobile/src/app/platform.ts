@@ -31,9 +31,27 @@ interface InstallState {
 
 const standaloneQuery = window.matchMedia('(display-mode: standalone), (display-mode: fullscreen)');
 
+const ANDROID_APP_KEY = 'armt.androidApp';
+
+/**
+ * The Android app (a Trusted Web Activity) opens the site with an android-app:// referrer.
+ * Remembered for the session, so it survives the reload that applies an update.
+ */
+function openedFromAndroidApp(): boolean {
+  try {
+    if (document.referrer.startsWith('android-app://')) {
+      window.sessionStorage.setItem(ANDROID_APP_KEY, '1');
+      return true;
+    }
+    return window.sessionStorage.getItem(ANDROID_APP_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 export const useInstallStore = create<InstallState>()(() => ({
   promptEvent: null,
-  installed: standaloneQuery.matches,
+  installed: standaloneQuery.matches || openedFromAndroidApp(),
 }));
 
 // Chrome fires this early (often before React mounts), so listen at module load.
@@ -48,7 +66,8 @@ window.addEventListener('appinstalled', () => {
 /** Returns a function that shows Chrome's install dialog, or null when not installable. */
 export function useInstallPrompt(): (() => Promise<void>) | null {
   const promptEvent = useInstallStore((state) => state.promptEvent);
-  if (promptEvent == null) return null;
+  const installed = useInstallStore((state) => state.installed);
+  if (promptEvent == null || installed) return null;
   return async () => {
     await promptEvent.prompt();
     await promptEvent.userChoice;

@@ -9,6 +9,7 @@
   "score": "Score",
   "issued": "Issued",
   "validUntil": "Valid until",
+  "validUntilDate": "Valid until {{date}}",
   "id": "Certificate ID",
   "workerId": "Worker ID",
   "worker": "Worker",
