@@ -8,7 +8,6 @@ in a web/Android admin portal.
 
 | What                 | Where                                                                                                                         |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Worker app (web)     | https://ar-mining-training.vercel.app                                                                                         |
 | Worker app (Android) | `apps/android/dist/ar-mining-training.apk` (built by `npm run android`)                                                       |
 | Admin app (Android)  | `apps/android/dist/ar-training-admin.apk` (built by `npm run android:admin`)                                                  |
 | API                  | On the laptop: `npm run dev:api`; the phone reaches it over USB (`adb reverse`). Optional cloud hosting: `npm run deploy:api` |
